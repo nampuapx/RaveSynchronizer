@@ -1225,7 +1225,8 @@ void HAL_UART_IRQHandler(UART_HandleTypeDef *huart)
   /* UART in mode Receiver ---------------------------------------------------*/
   if((tmp_flag != RESET) && (tmp_it_source != RESET))
   { 
-    UART_Receive_IT(huart);
+    //UART_Receive_IT(huart);
+    my_UART_Receive_IT(huart);
   }
   
   tmp_flag = __HAL_UART_GET_FLAG(huart, UART_FLAG_TXE);

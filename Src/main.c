@@ -107,7 +107,7 @@ int main(void)
   MX_USART1_UART_Init();
 
   /* USER CODE BEGIN 2 */
-
+  	  Onboard_led_OFF();
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -317,6 +317,14 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+void Onboard_led_ON(void){
+	HAL_GPIO_WritePin(LED_ONBOARD_BLUE_GPIO_Port, LED_ONBOARD_BLUE_Pin, GPIO_PIN_RESET);
+}
+
+void Onboard_led_OFF(void){
+	HAL_GPIO_WritePin(LED_ONBOARD_BLUE_GPIO_Port, LED_ONBOARD_BLUE_Pin, GPIO_PIN_SET);
+}
+
 /* USER CODE END 4 */
 
 /* StartDefaultTask function */
@@ -338,6 +346,17 @@ void StartLedTask(void const * argument)
   /* USER CODE BEGIN StartLedTask */
   /* Infinite loop */
 
+//	  for(;;)
+//	  {
+//
+//			HAL_GPIO_WritePin(LED_ONBOARD_BLUE_GPIO_Port, LED_ONBOARD_BLUE_Pin, GPIO_PIN_SET);
+//			osDelay(100);
+//			HAL_GPIO_WritePin(LED_ONBOARD_BLUE_GPIO_Port, LED_ONBOARD_BLUE_Pin, GPIO_PIN_RESET);
+//
+//	    osDelay(100);
+//	  }
+
+
 	led_task();
 //  for(;;)
 //  {
@@ -352,12 +371,12 @@ void Start_lamp_Task(void const * argument)
   /* USER CODE BEGIN Start_lamp_Task */
   /* Infinite loop */
 
-
-	lamp_Task();
 //  for(;;)
 //  {
 //    osDelay(10);
 //  }
+	lamp_Task();
+
   /* USER CODE END Start_lamp_Task */
 }
 
@@ -366,11 +385,12 @@ void Start_Perf_Task(void const * argument)
 {
   /* USER CODE BEGIN Start_Perf_Task */
   /* Infinite loop */
-	Perf_Task();
 //  for(;;)
 //  {
 //    osDelay(1);
 //  }
+	Perf_Task();
+
   /* USER CODE END Start_Perf_Task */
 }
 

@@ -28,14 +28,14 @@ __weak void encoder_stepdown(encoder_HandleTypeDef * enc_struct){
 
 _encoder_states get_encoder_states(encoder_HandleTypeDef * enc_struct){
 
-	if(enc_struct->line01->extLine_level_states){
-				if(enc_struct->line02->extLine_level_states){
+	if(enc_struct->line01->extLine_level_status){
+				if(enc_struct->line02->extLine_level_status){
 					return one_one;
 				}else{
 					return one_zero;
 				}
 	}else{
-				if(enc_struct->line02->extLine_level_states){
+				if(enc_struct->line02->extLine_level_status){
 					return zero_one;
 				}else{
 					return zero_zero;

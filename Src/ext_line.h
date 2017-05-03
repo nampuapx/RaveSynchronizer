@@ -22,9 +22,9 @@ typedef enum {
 
 typedef struct
 {
-	int8_t line_state_counter;
+	uint8_t line_state_counter;
 	_extLine_processing_states extLine_states;
-	_extLine_level_states extLine_level_states;
+	_extLine_level_states extLine_level_status;
 	GPIO_TypeDef* GPIOx;
 	uint16_t GPIO_Pin;
 }extLine_HandleTypeDef;

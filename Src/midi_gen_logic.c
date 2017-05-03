@@ -72,7 +72,7 @@ void Perf_Task(void){
 
 	  for(;;)
 	  {
-		  encoder_handle(&enc01_struct);
+		  //encoder_handle(&enc01_struct);
 		  start_button_handle();
 		  osDelay(1);
 	  }
@@ -90,17 +90,22 @@ void lamp_Task(void){
 
 		for(;;)
 		{
-			xTaskNotifyWait( 	0x00,      /* Don't clear any notification bits on entry. */
-								0xffffffff , /* Reset the notification value to 0 on exit. */
-								&ulNotifiedValue, /* Notified value pass out in
-												  ulNotifiedValue. */
-								portMAX_DELAY );  /* Block indefinitely. */
+//			xTaskNotifyWait( 	0x00,      /* Don't clear any notification bits on entry. */
+//								0xffffffff , /* Reset the notification value to 0 on exit. */
+//								&ulNotifiedValue, /* Notified value pass out in
+//												  ulNotifiedValue. */
+//								portMAX_DELAY );  /* Block indefinitely. */
+
+
+
+//
+//		HAL_GPIO_WritePin(lamp_01_GPIO_Port, lamp_01_Pin, GPIO_PIN_SET);
+//		osDelay(100);
+//		HAL_GPIO_WritePin(lamp_01_GPIO_Port, lamp_01_Pin, GPIO_PIN_RESET);
+						//Onboard_led_ON();
+						osDelay(100);
+						Onboard_led_OFF();
 		}
-
-		HAL_GPIO_WritePin(lamp_01_GPIO_Port, lamp_01_Pin, GPIO_PIN_SET);
-		osDelay(100);
-		HAL_GPIO_WritePin(lamp_01_GPIO_Port, lamp_01_Pin, GPIO_PIN_RESET);
-
 
 }
 
@@ -127,18 +132,17 @@ void led_task(void){
 												  ulNotifiedValue. */
 								portMAX_DELAY );  /* Block indefinitely. */
 
-			if(( ulNotifiedValue & 0x01 ) != 0 ){
-				HAL_GPIO_WritePin(LED_ONBOARD_BLUE_GPIO_Port, LED_ONBOARD_BLUE_Pin, GPIO_PIN_SET);
-				osDelay(10);
-				HAL_GPIO_WritePin(LED_ONBOARD_BLUE_GPIO_Port, LED_ONBOARD_BLUE_Pin, GPIO_PIN_RESET);
-			}
-
+//			if(( ulNotifiedValue & 0x01 ) != 0 ){
+//				Onboard_led_ON();
+//				osDelay(10);
+//				Onboard_led_OFF();
+//			}
+//
 	        if(( ulNotifiedValue & 0x02 ) != 0 )
 	        {
-				HAL_GPIO_WritePin(LED_ONBOARD_BLUE_GPIO_Port, LED_ONBOARD_BLUE_Pin, GPIO_PIN_SET);
+	        	Onboard_led_ON();
 				osDelay(100);
-				HAL_GPIO_WritePin(LED_ONBOARD_BLUE_GPIO_Port, LED_ONBOARD_BLUE_Pin, GPIO_PIN_RESET);
-
+				Onboard_led_OFF();
 	        }
 	  }
 }
@@ -148,7 +152,7 @@ void start_button_handle(void){
 
 
 	if(extLine_get_new_state(&start_button_extLine_struct)){
-		if(start_button_extLine_struct.extLine_level_states == extLine_level_ZERO){
+		if(start_button_extLine_struct.extLine_level_status == extLine_level_ZERO){
 			xTaskNotify(LedTaskHandle, ( 1UL << 1UL ), eSetBits );
 
 		}
@@ -164,12 +168,74 @@ uint8_t rr;
   /* Prevent unused argument(s) compilation warning */
   UNUSED(huart);
   rr = uartRX_byte;
-  if (HAL_UART_Receive_IT(&huart1, (uint8_t *)&uartRX_byte, 1) != HAL_OK) {
-      Error_Handler();
+//  if (HAL_UART_Receive_IT(huart, (uint8_t *)&uartRX_byte, 1) != HAL_OK) {
+//      Error_Handler();
+//  }
+ // midi_parser_byte(rr);
+
+  if(rr==248){
+		//xTaskNotify(LedTaskHandle, ( 1UL << 1UL ), eSetBits );
+	  Onboard_led_ON();
   }
-  midi_parser_byte(rr);
 
 }
+
+
+
+
+void  my_UART_Receive_IT(UART_HandleTypeDef *huart)
+{
+//  uint16_t* tmp;
+//  uint32_t tmp_state = 0;
+//
+//  tmp_state = huart->State;
+//  if((tmp_state == HAL_UART_STATE_BUSY_RX) || (tmp_state == HAL_UART_STATE_BUSY_TX_RX))
+//  {
+
+
+//      if(huart->Init.Parity == UART_PARITY_NONE)
+//      {
+		*huart->pRxBuffPtr =  (uint8_t)(huart->Instance->DR & (uint8_t)0x00FF);
+		HAL_UART_RxCpltCallback(huart);
+//      }
+//      else
+//      {
+//        *huart->pRxBuffPtr++ = (uint8_t)(huart->Instance->DR & (uint8_t)0x007F);
+//      }
+//
+
+//    if(--huart->RxXferCount == 0)
+//    {
+//      __HAL_UART_DISABLE_IT(huart, UART_IT_RXNE);
+//
+//      /* Check if a transmit process is ongoing or not */
+//      if(huart->State == HAL_UART_STATE_BUSY_TX_RX)
+//      {
+//        huart->State = HAL_UART_STATE_BUSY_TX;
+//      }
+//      else
+//      {
+//        /* Disable the UART Parity Error Interrupt */
+//        __HAL_UART_DISABLE_IT(huart, UART_IT_PE);
+//
+//        /* Disable the UART Error Interrupt: (Frame error, noise error, overrun error) */
+//        __HAL_UART_DISABLE_IT(huart, UART_IT_ERR);
+//
+//        huart->State = HAL_UART_STATE_READY;
+//      }
+//      HAL_UART_RxCpltCallback(huart);
+//
+//      return HAL_OK;
+//    }
+//    return HAL_OK;
+//  }
+//  else
+//  {
+//    return HAL_BUSY;
+//  }
+}
+
+
 
 
 
