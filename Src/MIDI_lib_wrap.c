@@ -29,11 +29,22 @@ void MIDI_recive_clock_pulse_handler(void){
 
 		xHigherPriorityTaskWoken = pdFALSE;
 		xTaskNotifyFromISR( LedTaskHandle,
+								( 1UL << 1UL ),
+								eSetBits,
+								&xHigherPriorityTaskWoken );
+		portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+	}
+	else if(!(start_status % 24)){
+
+		xHigherPriorityTaskWoken = pdFALSE;
+		xTaskNotifyFromISR( LedTaskHandle,
 								( 1UL << 0UL ),
 								eSetBits,
 								&xHigherPriorityTaskWoken );
 		portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 	}
+
+
 }
 
 
@@ -44,7 +55,7 @@ void MIDI_recive_start_handler(void){
 	put_MIDI_start();
 	xHigherPriorityTaskWoken = pdFALSE;
 	xTaskNotifyFromISR( LedTaskHandle,
-							( 1UL << 0UL ),
+							( 1UL << 1UL ),
 							eSetBits,
 							&xHigherPriorityTaskWoken );
 	portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
@@ -66,6 +77,13 @@ void start_button_handle(extLine_HandleTypeDef *start_button_extLine_struct){
 			resturt_counter = 0;
 			start_status = 5;
 			put_MIDI_start();
+
+
+			xTaskNotify( LedTaskHandle,
+									( 1UL << 1UL ),
+									eSetBits );
+
+
 		}
 	}
 

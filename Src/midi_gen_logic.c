@@ -130,16 +130,16 @@ void led_task(void){
 												  ulNotifiedValue. */
 								portMAX_DELAY );  /* Block indefinitely. */
 
-//			if(( ulNotifiedValue & 0x01 ) != 0 ){
-//				Onboard_led_ON();
-//				osDelay(10);
-//				Onboard_led_OFF();
-//			}
-//
+			if(( ulNotifiedValue & 0x02 ) != 0 ){
+				Onboard_led_ON();
+				osDelay(200);
+				Onboard_led_OFF();
+			}
+
 	        if(( ulNotifiedValue & 0x01 ) != 0 )
 	        {
 	        	Onboard_led_ON();
-				osDelay(20);
+				osDelay(10);
 				Onboard_led_OFF();
 	        }
 	  }
