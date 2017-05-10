@@ -61,7 +61,7 @@ void MIDI_recive_start_handler(void){
 	portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 
 	resturt_counter = 0;
-	start_status = 5;
+	start_status = 0;
 
 }
 
@@ -75,7 +75,7 @@ void start_button_handle(extLine_HandleTypeDef *start_button_extLine_struct){
 			//xTaskNotify(LedTaskHandle, ( 1UL << 1UL ), eSetBits );
 
 			resturt_counter = 0;
-			start_status = 5;
+			start_status = 0;
 			put_MIDI_start();
 
 
