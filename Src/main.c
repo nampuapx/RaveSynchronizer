@@ -297,13 +297,13 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : LED_ONBOARD_BLUE_Pin */
   GPIO_InitStruct.Pin = LED_ONBOARD_BLUE_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_ONBOARD_BLUE_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : lamp_01_Pin */
   GPIO_InitStruct.Pin = lamp_01_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(lamp_01_GPIO_Port, &GPIO_InitStruct);
 
