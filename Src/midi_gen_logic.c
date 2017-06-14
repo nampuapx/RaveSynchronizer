@@ -33,6 +33,7 @@
 extern osThreadId LedTaskHandle;
 extern UART_HandleTypeDef huart1;
 extern osThreadId lamp_TaskHandle;
+extern TIM_HandleTypeDef htim1;
 
 extern uint8_t uartRX_byte;
 
@@ -59,7 +60,7 @@ void Perf_Task(void){
 	enc01_struct.line01 = &enc01_extLine_struct;
 	enc01_struct.line02 = &enc02_extLine_struct;
 
-
+	HAL_TIM_Base_Start_IT(&htim1);
 
     if (HAL_UART_Receive_IT(&huart1, (uint8_t *)&uartRX_byte, 1) != HAL_OK) {
         Error_Handler();
@@ -104,12 +105,23 @@ void TIM1_PeriodElapsedCallback(void){
 
 	BaseType_t xHigherPriorityTaskWoken;
 
+//	xHigherPriorityTaskWoken = pdFALSE;
+//	xTaskNotifyFromISR( lamp_TaskHandle,
+//							( 1UL << 0UL ),
+//	                        eSetBits,
+//	                        &xHigherPriorityTaskWoken );
+//	portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+
 	xHigherPriorityTaskWoken = pdFALSE;
-	xTaskNotifyFromISR( LedTaskHandle,
+	xTaskNotifyFromISR( lamp_TaskHandle,
 							( 1UL << 0UL ),
-	                        eSetBits,
-	                        &xHigherPriorityTaskWoken );
+							eSetBits,
+							&xHigherPriorityTaskWoken );
 	portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+
+
+//	Onboard_led_TOGG();
+//	__NOP();
 }
 
 
