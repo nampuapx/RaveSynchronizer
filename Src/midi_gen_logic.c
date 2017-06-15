@@ -33,22 +33,61 @@
 extern osThreadId LedTaskHandle;
 extern UART_HandleTypeDef huart1;
 extern osThreadId lamp_TaskHandle;
-extern TIM_HandleTypeDef htim1;
+
 
 extern uint8_t uartRX_byte;
-
-
 
 extLine_HandleTypeDef 	enc01_extLine_struct,
 						enc02_extLine_struct,
 						start_button_extLine_struct;
 
-encoder_HandleTypeDef enc01_struct;
+encoder_HandleTypeDef	enc01_struct;
 
 
+extern TIM_HandleTypeDef	htim1;
+#define SEC_IN_MIN	60
+#define MIDI_CLOCK_PER_BEAT	24
+#define MIDI_CLOCK_TIMER_PRESCALER	htim1.Init.Prescaler
+#define MIDI_CLOCK_TIMER_PERIOD		htim1.Init.Period
+
+#define TIMER_PRESCALER_VALUE	100
+#define DEF_BPM  100
+uint16_t bpm =  DEF_BPM;
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
+void bpm_hardware_timer_setup(uint16_t bpm_val){
+
+uint32_t	period_init_val = 0;
+
+	period_init_val = HAL_RCC_GetHCLKFreq();
+	period_init_val	/= TIMER_PRESCALER_VALUE;
+	period_init_val	/= MIDI_CLOCK_PER_BEAT;
+	period_init_val *= SEC_IN_MIN;
+
+	period_init_val /= bpm;
+
+	MIDI_CLOCK_TIMER_PRESCALER = TIMER_PRESCALER_VALUE;
+	MIDI_CLOCK_TIMER_PERIOD = (uint16_t)period_init_val;
+
+
+
+	if (HAL_TIM_Base_Init(&htim1) != HAL_OK)
+	  {
+	    _Error_Handler(__FILE__, __LINE__);
+	  }
+}
+
+void encoder_stepup(encoder_HandleTypeDef * enc_struct){
+	bpm++;
+	bpm_hardware_timer_setup(bpm);
+}
+
+void encoder_stepdown(encoder_HandleTypeDef * enc_struct){
+	bpm--;
+	bpm_hardware_timer_setup(bpm);
+}
+
 
 void Perf_Task(void){
 
@@ -66,6 +105,7 @@ void Perf_Task(void){
         Error_Handler();
     }
 
+    bpm_hardware_timer_setup(100);
 
 	  for(;;)
 	  {
@@ -105,12 +145,6 @@ void TIM1_PeriodElapsedCallback(void){
 
 	BaseType_t xHigherPriorityTaskWoken;
 
-//	xHigherPriorityTaskWoken = pdFALSE;
-//	xTaskNotifyFromISR( lamp_TaskHandle,
-//							( 1UL << 0UL ),
-//	                        eSetBits,
-//	                        &xHigherPriorityTaskWoken );
-//	portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 
 	xHigherPriorityTaskWoken = pdFALSE;
 	xTaskNotifyFromISR( lamp_TaskHandle,
@@ -119,9 +153,6 @@ void TIM1_PeriodElapsedCallback(void){
 							&xHigherPriorityTaskWoken );
 	portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 
-
-//	Onboard_led_TOGG();
-//	__NOP();
 }
 
 
