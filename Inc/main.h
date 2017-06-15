@@ -56,18 +56,22 @@
 
 /* Private define ------------------------------------------------------------*/
 
-#define LED_ONBOARD_BLUE_Pin GPIO_PIN_13
-#define LED_ONBOARD_BLUE_GPIO_Port GPIOC
+#define LED_ONBOARD_Pin GPIO_PIN_13
+#define LED_ONBOARD_GPIO_Port GPIOC
+#define bttn_start_request_Pin GPIO_PIN_1
+#define bttn_start_request_GPIO_Port GPIOB
 #define lamp_01_Pin GPIO_PIN_2
 #define lamp_01_GPIO_Port GPIOB
-#define button01_Pin GPIO_PIN_10
-#define button01_GPIO_Port GPIOB
-#define button02_Pin GPIO_PIN_11
-#define button02_GPIO_Port GPIOB
-#define enc01_Pin GPIO_PIN_8
-#define enc01_GPIO_Port GPIOB
-#define enc02_Pin GPIO_PIN_9
-#define enc02_GPIO_Port GPIOB
+#define bttn_GlobalStart_Pin GPIO_PIN_10
+#define bttn_GlobalStart_GPIO_Port GPIOB
+#define bttn_GlobalStop_Pin GPIO_PIN_11
+#define bttn_GlobalStop_GPIO_Port GPIOB
+#define switch_ExtInt_Pin GPIO_PIN_12
+#define switch_ExtInt_GPIO_Port GPIOB
+#define enc01_ch1_Pin GPIO_PIN_8
+#define enc01_ch1_GPIO_Port GPIOB
+#define enc01_ch2_Pin GPIO_PIN_9
+#define enc01_ch2_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

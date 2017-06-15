@@ -12,4 +12,7 @@ extern osThreadId LedTaskHandle;
 extern UART_HandleTypeDef huart1;
 extern osThreadId lamp_TaskHandle;
 
+extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart2;
+
 #endif /* SYS_MAIN_H_ */

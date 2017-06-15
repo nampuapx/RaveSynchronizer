@@ -6,39 +6,78 @@
  */
 
 #include "stm32f1xx_hal.h"
+#include "cmsis_os.h"
+#include "MIDI_lib\midi_lib.h"
+#include "sys_main.h"
 
-extern UART_HandleTypeDef huart1;
+#define UART2MAX485		huart1
+#define UART2PLAIN_MIDI	huart2
 
 uint8_t start_arm = 0, clock_arm = 0;
 
 #define MIDI_REAL_TIME_OUT_STACK_SIZE 10
+//uint8_t midi_real_time_out_stack[MIDI_REAL_TIME_OUT_STACK_SIZE];
+//uint8_t to_MRTOS_read=0,to_MRTOS_write=0;
+
+
+typedef struct{
 uint8_t midi_real_time_out_stack[MIDI_REAL_TIME_OUT_STACK_SIZE];
-uint8_t to_MRTOS_read=0,to_MRTOS_write=0;
+uint8_t to_MRTOS_read;
+uint8_t	to_MRTOS_write;
+}_uarts_buff;
+
+_uarts_buff uarts_buff_2_max485, uarts_buff_2_plain_midi;
 
 uint8_t uartTX_byte;
 uint8_t uartRX_byte;
 
+UART_HandleTypeDef * UART_Handle_selector = &UART2MAX485;
 
+void UART_2_MAX485_switch(void){
+
+	UART_Handle_selector = &UART2MAX485;
+}
+
+void UART_2_plain_MIDI_select(void){
+
+	UART_Handle_selector = &UART2PLAIN_MIDI;
+}
 
 void little_buff_add(uint8_t in){
 	uint8_t tt;
+	_uarts_buff * to_uarts_buff;
 
-	  midi_real_time_out_stack[to_MRTOS_write] = in;
-	  tt = to_MRTOS_write;
-	  to_MRTOS_write++;
-	  to_MRTOS_write %= MIDI_REAL_TIME_OUT_STACK_SIZE;
-	  if(to_MRTOS_write == to_MRTOS_read)to_MRTOS_write = tt;
+	if(UART_Handle_selector == &UART2MAX485){
+		to_uarts_buff = &uarts_buff_2_max485;
+	}else if(UART_Handle_selector == &UART2PLAIN_MIDI){
+		to_uarts_buff = &uarts_buff_2_plain_midi;
+	}
+
+
+	to_uarts_buff->midi_real_time_out_stack[to_uarts_buff->to_MRTOS_write] = in;
+	tt = to_uarts_buff->to_MRTOS_write;
+	to_uarts_buff->to_MRTOS_write++;
+	to_uarts_buff->to_MRTOS_write %= MIDI_REAL_TIME_OUT_STACK_SIZE;
+	if(to_uarts_buff->to_MRTOS_write == to_uarts_buff->to_MRTOS_read)to_uarts_buff->to_MRTOS_write = tt;
+
+
+	//midi_real_time_out_stack[to_MRTOS_write] = in;
+	  //tt = to_MRTOS_write;
+	  //to_MRTOS_write++;
+	  //to_MRTOS_write %= MIDI_REAL_TIME_OUT_STACK_SIZE;
+	  //if(to_MRTOS_write == to_MRTOS_read)to_MRTOS_write = tt;
+
 }
 
 
 void put_MIDI_real_time(uint8_t real_time_command){
 	  uint32_t tmp_state = 0;
 
-	  tmp_state = huart1.State;
+	  tmp_state = UART_Handle_selector->State;
 	  if((tmp_state == HAL_UART_STATE_READY) || (tmp_state == HAL_UART_STATE_BUSY_RX)){
 
 		uartTX_byte = real_time_command;
-		HAL_UART_Transmit_IT(&huart1, (uint8_t *)&uartTX_byte, 1);
+		HAL_UART_Transmit_IT(UART_Handle_selector, (uint8_t *)&uartTX_byte, 1);
 
 	  }else{
 		  little_buff_add(real_time_command);
@@ -48,20 +87,29 @@ void put_MIDI_real_time(uint8_t real_time_command){
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart){
   uint32_t tmp_state = 0;
-
+	_uarts_buff * to_uarts_buff;
 
 	/* Prevent unused argument(s) compilation warning */
   UNUSED(huart);
 
-  if(to_MRTOS_read != to_MRTOS_write){
+	if(huart == &UART2MAX485){
+		to_uarts_buff = &uarts_buff_2_max485;
+	}else if(huart == &UART2PLAIN_MIDI){
+		to_uarts_buff = &uarts_buff_2_plain_midi;
+	}
 
-	  tmp_state = huart1.State;
+  if(to_uarts_buff->to_MRTOS_write != to_uarts_buff->to_MRTOS_read){
+
+	  tmp_state = huart->State;
 	  if((tmp_state == HAL_UART_STATE_READY) || (tmp_state == HAL_UART_STATE_BUSY_RX)){
 
-		uartTX_byte = midi_real_time_out_stack[to_MRTOS_read];
-		HAL_UART_Transmit_IT(&huart1, (uint8_t *)&uartTX_byte, 1);
-		to_MRTOS_read++;
-		to_MRTOS_read %= MIDI_REAL_TIME_OUT_STACK_SIZE;
+		//uartTX_byte = midi_real_time_out_stack[to_MRTOS_read];
+		  uartTX_byte = to_uarts_buff->midi_real_time_out_stack[to_uarts_buff->to_MRTOS_read];
+		HAL_UART_Transmit_IT(huart, (uint8_t *)&uartTX_byte, 1);
+		//to_MRTOS_read++;
+		to_uarts_buff->to_MRTOS_read++;
+		//to_MRTOS_read %= MIDI_REAL_TIME_OUT_STACK_SIZE;
+		to_uarts_buff->to_MRTOS_read %= MIDI_REAL_TIME_OUT_STACK_SIZE;
 	  }
   }
 }

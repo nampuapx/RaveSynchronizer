@@ -31,16 +31,19 @@
 #include "encoder.h"
 #include "MIDI_lib\midi_lib.h"
 #include <sys_main.h>
+#include "midi_gen_logic.h"
 
 
 extern uint8_t uartRX_byte;
 
 extLine_HandleTypeDef 	enc01_extLine_struct,
 						enc02_extLine_struct,
-						start_button_extLine_struct;
+						start_request__button_extLine_struct,
+						ExtInt_switch_extLine_struct;
 
 encoder_HandleTypeDef	enc01_struct;
 
+#define BUTTON_BLINK_DELAY 100
 
 extern TIM_HandleTypeDef	htim1;
 #define SEC_IN_MIN	60
@@ -56,6 +59,12 @@ uint16_t bpm =  DEF_BPM;
 #define DEFAULT_RESTART_STEPS_VALUE	(MIDI_CLOCK_PER_BEAT * 4) //16 steps
 uint8_t MIDI_start_status = 0;
 uint16_t MIDI_resturt_counter,MIDI_restart_value = DEFAULT_RESTART_STEPS_VALUE;
+
+uint8_t need_start = 0;
+
+_ext_int_state ext_int_state = external_clock_and_transport;
+
+
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
@@ -93,11 +102,12 @@ void encoder_stepdown(encoder_HandleTypeDef * enc_struct){
 
 
 void Perf_Task(void){
+	uint8_t	led_trigger,led_trigger_val;
 
-	extLine_init(&start_button_extLine_struct, button01_GPIO_Port, button01_Pin);
-
-	extLine_init(&enc01_extLine_struct, enc01_GPIO_Port, enc01_Pin);
-	extLine_init(&enc01_extLine_struct, enc02_GPIO_Port, enc02_Pin);
+	extLine_init(&start_request__button_extLine_struct, bttn_start_request_GPIO_Port, bttn_start_request_Pin);
+	extLine_init(&ExtInt_switch_extLine_struct, switch_ExtInt_GPIO_Port, switch_ExtInt_Pin);
+	extLine_init(&enc01_extLine_struct, enc01_ch1_GPIO_Port, enc01_ch1_Pin);
+	extLine_init(&enc01_extLine_struct, enc01_ch2_GPIO_Port, enc01_ch2_Pin);
 
 	enc01_struct.line01 = &enc01_extLine_struct;
 	enc01_struct.line02 = &enc02_extLine_struct;
@@ -113,7 +123,27 @@ void Perf_Task(void){
 	  for(;;)
 	  {
 		  encoder_handle(&enc01_struct);
-		  start_button_handle(&start_button_extLine_struct);
+		  start_request_button_handle(&start_request__button_extLine_struct);
+		  ExtInt_switch_handle(&ExtInt_switch_extLine_struct);
+
+		  if(need_start){
+			  if(led_trigger){
+				  if(!led_trigger_val--){
+					  led_trigger_val = BUTTON_BLINK_DELAY;
+					  led_trigger = 0;
+					  Onboard_led_ON();
+					 // lamp01_ON();
+				  }
+			  }else{
+				  if(!led_trigger_val--){
+					  led_trigger_val = BUTTON_BLINK_DELAY;
+					  led_trigger = 5;
+					  Onboard_led_OFF();
+					 // lamp01_OFF();
+				  }
+			  }
+		  }//if(need_start){
+
 		  osDelay(1);
 	  }
 }
@@ -146,16 +176,20 @@ void lamp_Task(void){
 
 void TIM1_PeriodElapsedCallback(void){
 
-	BaseType_t xHigherPriorityTaskWoken;
+//	BaseType_t xHigherPriorityTaskWoken;
+//
+//
+//	xHigherPriorityTaskWoken = pdFALSE;
+//	xTaskNotifyFromISR( lamp_TaskHandle,
+//							( 1UL << 0UL ),
+//							eSetBits,
+//							&xHigherPriorityTaskWoken );
+//	portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 
 
-	xHigherPriorityTaskWoken = pdFALSE;
-	xTaskNotifyFromISR( lamp_TaskHandle,
-							( 1UL << 0UL ),
-							eSetBits,
-							&xHigherPriorityTaskWoken );
-	portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-
+	if(ext_int_state == internal_clock_and_transport){
+		clock_pulse_event_handler();
+	}
 }
 
 

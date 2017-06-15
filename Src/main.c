@@ -46,7 +46,7 @@
   ******************************************************************************
   */
 /* Includes ------------------------------------------------------------------*/
-
+#include "main.h"
 #include "stm32f1xx_hal.h"
 #include "cmsis_os.h"
 
@@ -55,6 +55,13 @@
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
+CAN_HandleTypeDef hcan;
+
+I2C_HandleTypeDef hi2c1;
+
+SPI_HandleTypeDef hspi1;
+SPI_HandleTypeDef hspi2;
+
 TIM_HandleTypeDef htim1;
 
 UART_HandleTypeDef huart1;
@@ -77,6 +84,10 @@ static void MX_GPIO_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_USART2_UART_Init(void);
+static void MX_I2C1_Init(void);
+static void MX_SPI1_Init(void);
+static void MX_SPI2_Init(void);
+static void MX_CAN_Init(void);
 void StartDefaultTask(void const * argument);
 void StartLedTask(void const * argument);
 void Start_lamp_Task(void const * argument);
@@ -120,6 +131,10 @@ int main(void)
   MX_TIM1_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
+  MX_I2C1_Init();
+  MX_SPI1_Init();
+  MX_SPI2_Init();
+  MX_CAN_Init();
 
   /* USER CODE BEGIN 2 */
 	Onboard_led_OFF();
@@ -236,6 +251,95 @@ void SystemClock_Config(void)
   HAL_NVIC_SetPriority(SysTick_IRQn, 15, 0);
 }
 
+/* CAN init function */
+static void MX_CAN_Init(void)
+{
+
+  hcan.Instance = CAN1;
+  hcan.Init.Prescaler = 16;
+  hcan.Init.Mode = CAN_MODE_NORMAL;
+  hcan.Init.SJW = CAN_SJW_1TQ;
+  hcan.Init.BS1 = CAN_BS1_1TQ;
+  hcan.Init.BS2 = CAN_BS2_1TQ;
+  hcan.Init.TTCM = DISABLE;
+  hcan.Init.ABOM = DISABLE;
+  hcan.Init.AWUM = DISABLE;
+  hcan.Init.NART = DISABLE;
+  hcan.Init.RFLM = DISABLE;
+  hcan.Init.TXFP = DISABLE;
+  if (HAL_CAN_Init(&hcan) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+}
+
+/* I2C1 init function */
+static void MX_I2C1_Init(void)
+{
+
+  hi2c1.Instance = I2C1;
+  hi2c1.Init.ClockSpeed = 100000;
+  hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+  hi2c1.Init.OwnAddress1 = 0;
+  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c1.Init.OwnAddress2 = 0;
+  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+}
+
+/* SPI1 init function */
+static void MX_SPI1_Init(void)
+{
+
+  hspi1.Instance = SPI1;
+  hspi1.Init.Mode = SPI_MODE_MASTER;
+  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi1.Init.NSS = SPI_NSS_SOFT;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
+  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi1.Init.CRCPolynomial = 10;
+  if (HAL_SPI_Init(&hspi1) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+}
+
+/* SPI2 init function */
+static void MX_SPI2_Init(void)
+{
+
+  hspi2.Instance = SPI2;
+  hspi2.Init.Mode = SPI_MODE_MASTER;
+  hspi2.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi2.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi2.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi2.Init.NSS = SPI_NSS_SOFT;
+  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi2.Init.CRCPolynomial = 10;
+  if (HAL_SPI_Init(&hspi2) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+}
+
 /* TIM1 init function */
 static void MX_TIM1_Init(void)
 {
@@ -326,16 +430,24 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LED_ONBOARD_BLUE_GPIO_Port, LED_ONBOARD_BLUE_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LED_ONBOARD_GPIO_Port, LED_ONBOARD_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(lamp_01_GPIO_Port, lamp_01_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : LED_ONBOARD_BLUE_Pin */
-  GPIO_InitStruct.Pin = LED_ONBOARD_BLUE_Pin;
+  /*Configure GPIO pin : LED_ONBOARD_Pin */
+  GPIO_InitStruct.Pin = LED_ONBOARD_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LED_ONBOARD_BLUE_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(LED_ONBOARD_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : bttn_start_request_Pin bttn_GlobalStart_Pin bttn_GlobalStop_Pin enc01_ch1_Pin 
+                           enc01_ch2_Pin */
+  GPIO_InitStruct.Pin = bttn_start_request_Pin|bttn_GlobalStart_Pin|bttn_GlobalStop_Pin|enc01_ch1_Pin 
+                          |enc01_ch2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pin : lamp_01_Pin */
   GPIO_InitStruct.Pin = lamp_01_Pin;
@@ -343,26 +455,26 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(lamp_01_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : button01_Pin button02_Pin enc01_Pin enc02_Pin */
-  GPIO_InitStruct.Pin = button01_Pin|button02_Pin|enc01_Pin|enc02_Pin;
+  /*Configure GPIO pin : switch_ExtInt_Pin */
+  GPIO_InitStruct.Pin = switch_ExtInt_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(switch_ExtInt_GPIO_Port, &GPIO_InitStruct);
 
 }
 
 /* USER CODE BEGIN 4 */
 
 void Onboard_led_ON(void){
-	HAL_GPIO_WritePin(LED_ONBOARD_BLUE_GPIO_Port, LED_ONBOARD_BLUE_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(LED_ONBOARD_GPIO_Port, LED_ONBOARD_Pin, GPIO_PIN_RESET);
 }
 
 void Onboard_led_OFF(void){
-	HAL_GPIO_WritePin(LED_ONBOARD_BLUE_GPIO_Port, LED_ONBOARD_BLUE_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(LED_ONBOARD_GPIO_Port, LED_ONBOARD_Pin, GPIO_PIN_SET);
 }
 
 void Onboard_led_TOGG(void){
-	HAL_GPIO_TogglePin(LED_ONBOARD_BLUE_GPIO_Port, LED_ONBOARD_BLUE_Pin);
+	HAL_GPIO_TogglePin(LED_ONBOARD_GPIO_Port, LED_ONBOARD_Pin);
 }
 
 
