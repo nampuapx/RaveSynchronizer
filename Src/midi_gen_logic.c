@@ -65,6 +65,21 @@ uint8_t need_start = 0;
 _ext_int_state ext_int_state = external_clock_and_transport;
 
 
+
+
+
+uint8_t bell[8]  = {0x4,0xe,0xe,0xe,0x1f,0x0,0x4};
+uint8_t note[8]  = {0x2,0x3,0x2,0xe,0x1e,0xc,0x0};
+uint8_t clock[8] = {0x0,0xe,0x15,0x17,0x11,0xe,0x0};
+uint8_t heart[8] = {0x0,0xa,0x1f,0x1f,0xe,0x4,0x0};
+uint8_t duck[8]  = {0x0,0xc,0x1d,0xf,0xf,0x6,0x0};
+uint8_t check[8] = {0x0,0x1,0x3,0x16,0x1c,0x8,0x0};
+uint8_t cross[8] = {0x0,0x1b,0xe,0x4,0xe,0x1b,0x0};
+uint8_t retarrow[8] = {0x1,0x1,0x5,0x9,0x1f,0x8,0x4};
+
+
+
+
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
@@ -101,8 +116,100 @@ void encoder_stepdown(encoder_HandleTypeDef * enc_struct){
 }
 
 
+
+void displayKeyCodes(void) {
+  uint8_t i = 0;
+  while (1) {
+    LCDI2C_clear();
+    //LCDI2C_setCursor(2,2);
+    //LCDI2C_write_String("TEN Electronics");
+    LCDI2C_setCursor(0, 0);
+	char buf[10];
+	itoa(i, buf, 10);
+    LCDI2C_write_String("Cds 0x"); LCDI2C_write_String(buf);
+	itoa(i+19, buf, 10);
+    LCDI2C_write_String("-0x"); LCDI2C_write_String(buf);
+    LCDI2C_setCursor(0, 1);
+    int j;
+    for (j=0; j<20; j++) {
+      LCDI2C_write(i+j);
+    }
+    i+=16;
+    if (i<15) break;
+    osDelay(700);
+  }
+}
+
+
 void Perf_Task(void){
 	uint8_t	led_trigger,led_trigger_val;
+
+
+	LCDI2C_init(0x4e,16,2);
+
+	  for(int i = 0; i< 3; i++)
+	  {
+	    LCDI2C_backlight();
+	    osDelay(250);
+	    LCDI2C_noBacklight();
+	    osDelay(250);
+	  }
+
+
+	  LCDI2C_backlight(); // finish with backlight on
+
+
+	  LCDI2C_createChar(0, bell);
+	  LCDI2C_createChar(1, note);
+	  LCDI2C_createChar(2, clock);
+	  LCDI2C_createChar(3, heart);
+	  LCDI2C_createChar(4, duck);
+	  LCDI2C_createChar(5, check);
+	  LCDI2C_createChar(6, cross);
+	  LCDI2C_createChar(7, retarrow);
+	  LCDI2C_clear();
+
+
+	  LCDI2C_write(53);
+	//  Usart1_Send_String("End");
+	  osDelay(100);
+	  LCDI2C_clear();
+
+	  displayKeyCodes();
+
+	  osDelay(200);
+	  LCDI2C_setCursor(0,0);
+	  LCDI2C_write(0);
+	  LCDI2C_write(1);
+	  LCDI2C_write(2);
+	  LCDI2C_write(3);
+	  LCDI2C_setCursor(16,1);
+	  LCDI2C_write(4);
+	  LCDI2C_write(5);
+	  LCDI2C_write(6);
+	  LCDI2C_write(7);
+	  //LCDI2C_setCursor(16,2);
+	  LCDI2C_write(201);
+	  LCDI2C_write(177);
+	  LCDI2C_write(162);
+
+	for(;;){
+
+
+
+		osDelay(2);
+
+
+	}
+
+
+
+
+
+
+
+
+
 
 	extLine_init(&start_request__button_extLine_struct, bttn_start_request_GPIO_Port, bttn_start_request_Pin);
 	extLine_init(&ExtInt_switch_extLine_struct, switch_ExtInt_GPIO_Port, switch_ExtInt_Pin);
