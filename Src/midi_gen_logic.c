@@ -24,15 +24,13 @@
  *
  ******************************************************************************/
 //#include "main.h"
+
 #include "stm32f1xx_hal.h"
 #include "cmsis_os.h"
 #include "ext_line.h"
 #include "encoder.h"
 #include "MIDI_lib\midi_lib.h"
-
-extern osThreadId LedTaskHandle;
-extern UART_HandleTypeDef huart1;
-extern osThreadId lamp_TaskHandle;
+#include <sys_main.h>
 
 
 extern uint8_t uartRX_byte;
@@ -46,13 +44,18 @@ encoder_HandleTypeDef	enc01_struct;
 
 extern TIM_HandleTypeDef	htim1;
 #define SEC_IN_MIN	60
-#define MIDI_CLOCK_PER_BEAT	24
 #define MIDI_CLOCK_TIMER_PRESCALER	htim1.Init.Prescaler
 #define MIDI_CLOCK_TIMER_PERIOD		htim1.Init.Period
 
 #define TIMER_PRESCALER_VALUE	100
 #define DEF_BPM  100
 uint16_t bpm =  DEF_BPM;
+
+
+
+#define DEFAULT_RESTART_STEPS_VALUE	(MIDI_CLOCK_PER_BEAT * 4) //16 steps
+uint8_t MIDI_start_status = 0;
+uint16_t MIDI_resturt_counter,MIDI_restart_value = DEFAULT_RESTART_STEPS_VALUE;
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////
@@ -109,7 +112,7 @@ void Perf_Task(void){
 
 	  for(;;)
 	  {
-		  //encoder_handle(&enc01_struct);
+		  encoder_handle(&enc01_struct);
 		  start_button_handle(&start_button_extLine_struct);
 		  osDelay(1);
 	  }

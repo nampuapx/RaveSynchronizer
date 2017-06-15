@@ -46,12 +46,12 @@
   ******************************************************************************
   */
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+
 #include "stm32f1xx_hal.h"
 #include "cmsis_os.h"
 
 /* USER CODE BEGIN Includes */
-
+#include <sys_main.h>
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
