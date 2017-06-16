@@ -10,7 +10,7 @@
 
 extern osThreadId LedTaskHandle;
 extern UART_HandleTypeDef huart1;
-extern osThreadId lamp_TaskHandle;
+extern osThreadId lcd_TaskHandle;
 
 extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart2;

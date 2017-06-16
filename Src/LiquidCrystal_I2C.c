@@ -246,7 +246,7 @@ void LCDI2C_command(uint8_t value) {
 void LCDI2C_send(uint8_t value, uint8_t mode) {
 	uint8_t highnib=value&0xf0;
 	uint8_t lownib=(value<<4)&0xf0;
-       LCDI2C_write4bits((highnib)|mode);
+	LCDI2C_write4bits((highnib)|mode);
 	LCDI2C_write4bits((lownib)|mode);
 }
 
@@ -256,9 +256,22 @@ void LCDI2C_write4bits(uint8_t value) {
 }
 
 void LCDI2C_expanderWrite(uint8_t _data){
+	uint32_t ulNotifiedValue;
+
 	if(lcdi2c.backlightval)_data |= lcdi2c.backlightval;
-	HAL_I2C_Master_Transmit(&hi2c1, lcdi2c.Addr, &_data, 1, HAL_MAX_DELAY);
+	//HAL_I2C_Master_Transmit(&hi2c1, lcdi2c.Addr, &_data, 1, HAL_MAX_DELAY);
+	HAL_I2C_Master_Transmit_IT(&hi2c1, lcdi2c.Addr, &_data, 1);
+
+
+	xTaskNotifyWait( 	0x00,      /* Don't clear any notification bits on entry. */
+						0xffffffff , /* Reset the notification value to 0 on exit. */
+						&ulNotifiedValue, /* Notified value pass out in
+										  ulNotifiedValue. */
+						portMAX_DELAY );  /* Block indefinitely. */
+
 }
+
+
 void LCDI2C_pulseEnable(uint8_t _data){
 	LCDI2C_expanderWrite(_data | En);	// En high
 	//DelayMC(1);		// enable pulse must be >450ns

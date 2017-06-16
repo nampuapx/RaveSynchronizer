@@ -32,6 +32,7 @@
 #include "MIDI_lib\midi_lib.h"
 #include <sys_main.h>
 #include "midi_gen_logic.h"
+#include "gui.h"
 
 
 extern uint8_t uartRX_byte;
@@ -51,7 +52,10 @@ extern TIM_HandleTypeDef	htim1;
 #define MIDI_CLOCK_TIMER_PERIOD		htim1.Init.Period
 
 #define TIMER_PRESCALER_VALUE	100
-#define DEF_BPM  100
+#define DEF_BPM		100
+#define BPM_MIN		30
+#define BPM_MAX		300
+
 uint16_t bpm =  DEF_BPM;
 
 
@@ -68,15 +72,6 @@ _ext_int_state ext_int_state = external_clock_and_transport;
 
 
 
-uint8_t bell[8]  = {0x4,0xe,0xe,0xe,0x1f,0x0,0x4};
-uint8_t note[8]  = {0x2,0x3,0x2,0xe,0x1e,0xc,0x0};
-uint8_t clock[8] = {0x0,0xe,0x15,0x17,0x11,0xe,0x0};
-uint8_t heart[8] = {0x0,0xa,0x1f,0x1f,0xe,0x4,0x0};
-uint8_t duck[8]  = {0x0,0xc,0x1d,0xf,0xf,0x6,0x0};
-uint8_t check[8] = {0x0,0x1,0x3,0x16,0x1c,0x8,0x0};
-uint8_t cross[8] = {0x0,0x1b,0xe,0x4,0xe,0x1b,0x0};
-uint8_t retarrow[8] = {0x1,0x1,0x5,0x9,0x1f,0x8,0x4};
-
 
 
 
@@ -92,7 +87,7 @@ uint32_t	period_init_val = 0;
 	period_init_val	/= MIDI_CLOCK_PER_BEAT;
 	period_init_val *= SEC_IN_MIN;
 
-	period_init_val /= bpm;
+	period_init_val /= bpm_val;
 
 	MIDI_CLOCK_TIMER_PRESCALER = TIMER_PRESCALER_VALUE;
 	MIDI_CLOCK_TIMER_PERIOD = (uint16_t)period_init_val;
@@ -107,107 +102,23 @@ uint32_t	period_init_val = 0;
 
 void encoder_stepup(encoder_HandleTypeDef * enc_struct){
 	bpm++;
+	if(bpm<BPM_MAX)bpm = BPM_MAX;
 	bpm_hardware_timer_setup(bpm);
+	gui_print_lcd_bpm();
 }
 
 void encoder_stepdown(encoder_HandleTypeDef * enc_struct){
 	bpm--;
+	if(bpm<BPM_MIN)bpm = BPM_MIN;
 	bpm_hardware_timer_setup(bpm);
+	gui_print_lcd_bpm();
 }
 
 
-
-void displayKeyCodes(void) {
-  uint8_t i = 0;
-  while (1) {
-    LCDI2C_clear();
-    //LCDI2C_setCursor(2,2);
-    //LCDI2C_write_String("TEN Electronics");
-    LCDI2C_setCursor(0, 0);
-	char buf[10];
-	itoa(i, buf, 10);
-    LCDI2C_write_String("Cds 0x"); LCDI2C_write_String(buf);
-	itoa(i+19, buf, 10);
-    LCDI2C_write_String("-0x"); LCDI2C_write_String(buf);
-    LCDI2C_setCursor(0, 1);
-    int j;
-    for (j=0; j<20; j++) {
-      LCDI2C_write(i+j);
-    }
-    i+=16;
-    if (i<15) break;
-    osDelay(700);
-  }
-}
 
 
 void Perf_Task(void){
 	uint8_t	led_trigger,led_trigger_val;
-
-
-	LCDI2C_init(0x4e,16,2);
-
-	  for(int i = 0; i< 3; i++)
-	  {
-	    LCDI2C_backlight();
-	    osDelay(250);
-	    LCDI2C_noBacklight();
-	    osDelay(250);
-	  }
-
-
-	  LCDI2C_backlight(); // finish with backlight on
-
-
-	  LCDI2C_createChar(0, bell);
-	  LCDI2C_createChar(1, note);
-	  LCDI2C_createChar(2, clock);
-	  LCDI2C_createChar(3, heart);
-	  LCDI2C_createChar(4, duck);
-	  LCDI2C_createChar(5, check);
-	  LCDI2C_createChar(6, cross);
-	  LCDI2C_createChar(7, retarrow);
-	  LCDI2C_clear();
-
-
-	  LCDI2C_write(53);
-	//  Usart1_Send_String("End");
-	  osDelay(100);
-	  LCDI2C_clear();
-
-	  displayKeyCodes();
-
-	  osDelay(200);
-	  LCDI2C_setCursor(0,0);
-	  LCDI2C_write(0);
-	  LCDI2C_write(1);
-	  LCDI2C_write(2);
-	  LCDI2C_write(3);
-	  LCDI2C_setCursor(16,1);
-	  LCDI2C_write(4);
-	  LCDI2C_write(5);
-	  LCDI2C_write(6);
-	  LCDI2C_write(7);
-	  //LCDI2C_setCursor(16,2);
-	  LCDI2C_write(201);
-	  LCDI2C_write(177);
-	  LCDI2C_write(162);
-
-	for(;;){
-
-
-
-		osDelay(2);
-
-
-	}
-
-
-
-
-
-
-
 
 
 
@@ -226,6 +137,9 @@ void Perf_Task(void){
     }
 
     bpm_hardware_timer_setup(100);
+
+    osDelay(2);
+    gui_print_lcd_bpm();
 
 	  for(;;)
 	  {
@@ -255,31 +169,6 @@ void Perf_Task(void){
 	  }
 }
 
-
-
-void lamp_Task(void){
-
-	uint32_t ulNotifiedValue;
-
-		for(;;)
-		{
-			xTaskNotifyWait( 	0x00,      /* Don't clear any notification bits on entry. */
-								0xffffffff , /* Reset the notification value to 0 on exit. */
-								&ulNotifiedValue, /* Notified value pass out in
-												  ulNotifiedValue. */
-								portMAX_DELAY );  /* Block indefinitely. */
-
-
-
-//
-//		HAL_GPIO_WritePin(lamp_01_GPIO_Port, lamp_01_Pin, GPIO_PIN_SET);
-//		osDelay(100);
-//		HAL_GPIO_WritePin(lamp_01_GPIO_Port, lamp_01_Pin, GPIO_PIN_RESET);
-						Onboard_led_ON();
-						osDelay(20);
-						Onboard_led_OFF();
-		}
-}
 
 void TIM1_PeriodElapsedCallback(void){
 

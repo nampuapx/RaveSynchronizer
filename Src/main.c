@@ -69,7 +69,7 @@ UART_HandleTypeDef huart2;
 
 osThreadId defaultTaskHandle;
 osThreadId LedTaskHandle;
-osThreadId lamp_TaskHandle;
+osThreadId lcd_TaskHandle;
 osThreadId Perf_TaskHandle;
 osTimerId timer01Handle;
 
@@ -90,7 +90,7 @@ static void MX_SPI2_Init(void);
 static void MX_CAN_Init(void);
 void StartDefaultTask(void const * argument);
 void StartLedTask(void const * argument);
-void Start_lamp_Task(void const * argument);
+void Start_lcd_Task(void const * argument);
 void Start_Perf_Task(void const * argument);
 void timer01_callback(void const * argument);
 
@@ -165,15 +165,15 @@ int main(void)
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of LedTask */
-  osThreadDef(LedTask, StartLedTask, osPriorityIdle, 0, 128);
+  osThreadDef(LedTask, StartLedTask, osPriorityNormal, 0, 128);
   LedTaskHandle = osThreadCreate(osThread(LedTask), NULL);
 
-  /* definition and creation of lamp_Task */
-  osThreadDef(lamp_Task, Start_lamp_Task, osPriorityIdle, 0, 128);
-  lamp_TaskHandle = osThreadCreate(osThread(lamp_Task), NULL);
+  /* definition and creation of lcd_Task */
+  osThreadDef(lcd_Task, Start_lcd_Task, osPriorityLow, 0, 128);
+  lcd_TaskHandle = osThreadCreate(osThread(lcd_Task), NULL);
 
   /* definition and creation of Perf_Task */
-  osThreadDef(Perf_Task, Start_Perf_Task, osPriorityIdle, 0, 256);
+  osThreadDef(Perf_Task, Start_Perf_Task, osPriorityNormal, 0, 256);
   Perf_TaskHandle = osThreadCreate(osThread(Perf_Task), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -523,17 +523,17 @@ void StartLedTask(void const * argument)
   /* USER CODE END StartLedTask */
 }
 
-/* Start_lamp_Task function */
-void Start_lamp_Task(void const * argument)
+/* Start_lcd_Task function */
+void Start_lcd_Task(void const * argument)
 {
-  /* USER CODE BEGIN Start_lamp_Task */
+  /* USER CODE BEGIN Start_lcd_Task */
   /* Infinite loop */
 
 //  for(;;)
 //  {
 //    osDelay(10);
 //  }
-	lamp_Task();
+	lcd_Task();
 
   /* USER CODE END Start_lamp_Task */
 }
