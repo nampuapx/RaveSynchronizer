@@ -15,8 +15,12 @@
 uint8_t ExtInt_predstate = 0;
 
 void start_request_button_handle(extLine_HandleTypeDef *start_button_extLine_struct){
+	if(extLine_get_new_state(start_button_extLine_struct)){
+		if(start_button_extLine_struct->extLine_level_status == extLine_level_ZERO){
+			need_start = 5;
+		}
+	}
 
-	need_start = 5;
 }
 
 

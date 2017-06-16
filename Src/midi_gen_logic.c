@@ -102,7 +102,7 @@ uint32_t	period_init_val = 0;
 
 void encoder_stepup(encoder_HandleTypeDef * enc_struct){
 	bpm++;
-	if(bpm<BPM_MAX)bpm = BPM_MAX;
+	if(bpm>BPM_MAX)bpm = BPM_MAX;
 	bpm_hardware_timer_setup(bpm);
 	gui_print_lcd_bpm();
 }
@@ -119,7 +119,6 @@ void encoder_stepdown(encoder_HandleTypeDef * enc_struct){
 
 void Perf_Task(void){
 	uint8_t	led_trigger,led_trigger_val;
-
 
 
 	extLine_init(&start_request__button_extLine_struct, bttn_start_request_GPIO_Port, bttn_start_request_Pin);
@@ -143,10 +142,24 @@ void Perf_Task(void){
 
 	  for(;;)
 	  {
-		  encoder_handle(&enc01_struct);
+		  //encoder_handle(&enc01_struct);
+
+
+//			if(extLine_get_new_state(&enc01_extLine_struct)){
+//
+//				//new_encoder_states = get_encoder_states(enc_struct);
+//				led_trigger = 0;
+//
+//			}
+//				if(extLine_get_new_state(&enc02_extLine_struct)){
+//
+//				//new_encoder_states = get_encoder_states(enc_struct);
+//				led_trigger = 0;
+//			}
+
 		  start_request_button_handle(&start_request__button_extLine_struct);
 		  ExtInt_switch_handle(&ExtInt_switch_extLine_struct);
-
+		//  need_start = 5;
 		  if(need_start){
 			  if(led_trigger){
 				  if(!led_trigger_val--){
