@@ -21,5 +21,6 @@ extern _ext_int_state ext_int_state;
 extern uint8_t MIDI_start_status;
 extern uint16_t MIDI_resturt_counter,MIDI_restart_value;
 extern uint8_t need_start;
+extern _ext_int_state ext_int_state;
 
 #endif /* MIDI_GEN_LOGIC_H_ */

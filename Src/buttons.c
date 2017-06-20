@@ -51,8 +51,10 @@ ExtInt_switch_handle(extLine_HandleTypeDef *start_button_extLine_struct){
 	if(extLine_get_new_state(start_button_extLine_struct)){
 		if(start_button_extLine_struct->extLine_level_status == extLine_level_ZERO){
 			ext_int_state = external_clock_and_transport;
+			gui_print_lcd_bpm();
 		}else{
 			ext_int_state = internal_clock_and_transport;
+			gui_print_lcd_bpm();
 		}
 	}
 

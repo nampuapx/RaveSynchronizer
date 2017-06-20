@@ -7,6 +7,7 @@
 #include "stm32f1xx_hal.h"
 #include "cmsis_os.h"
 #include <sys_main.h>
+#include "midi_gen_logic.h"
 
 #include "gui.h"
 
@@ -20,7 +21,11 @@ void gui_print_lcd_bpm(void){
 	type_q_lcd_element working_msg;
 
     working_msg.xy = 0x00;
-    sprintf(working_msg.txt,"BPM%3u",bpm);
+    if(ext_int_state == internal_clock_and_transport){
+    	sprintf(working_msg.txt,"BPM %3u",bpm);
+    }else{
+    	sprintf(working_msg.txt,"BPM EXT",bpm);
+    }
     xQueueSend( q_lcd, ( void * ) &working_msg, portMAX_DELAY );
 
 }

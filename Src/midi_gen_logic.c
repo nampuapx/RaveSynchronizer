@@ -68,7 +68,7 @@ uint16_t MIDI_resturt_counter,MIDI_restart_value = DEFAULT_RESTART_STEPS_VALUE;
 
 uint8_t need_start = 0;
 
-_ext_int_state ext_int_state = external_clock_and_transport;
+_ext_int_state ext_int_state = internal_clock_and_transport;
 
 
 
@@ -146,20 +146,8 @@ void Perf_Task(void){
 	  {
 		  encoder_handle(&enc01_struct);
 
-
-//			if(extLine_get_new_state(&enc01_extLine_struct)){
-//
-//				//new_encoder_states = get_encoder_states(enc_struct);
-//				led_trigger = 0;
-//
-//			}
-//				if(extLine_get_new_state(&enc02_extLine_struct)){
-//
-//				//new_encoder_states = get_encoder_states(enc_struct);
-//				led_trigger = 0;
-//			}
-
 		  start_request_button_handle(&start_request__button_extLine_struct);
+
 		  ExtInt_switch_handle(&ExtInt_switch_extLine_struct);
 		//  need_start = 5;
 		  if(need_start){
