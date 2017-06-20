@@ -33,6 +33,9 @@ void clock_pulse_event_handler(void){
 		if(need_start){
 			UART_2_plain_MIDI_select();
 			put_MIDI_start();
+
+			need_start = 0;
+			gui_print_start_wait_clear();
 		}
 
 		xHigherPriorityTaskWoken = pdFALSE;

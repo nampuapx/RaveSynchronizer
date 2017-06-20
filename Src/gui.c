@@ -31,28 +31,47 @@ void gui_print_lcd_bpm(void){
 }
 
 
+void gui_print_start_wait(void){
+	type_q_lcd_element working_msg;
+
+    working_msg.xy = 0x90;
+    sprintf(working_msg.txt,"WAIT");
+    xQueueSend( q_lcd, (void *) &working_msg, portMAX_DELAY );
+}
+
+void gui_print_start_wait_clear(void){
+	type_q_lcd_element working_msg;
+	BaseType_t xHigherPriorityTaskWoken;
+
+    working_msg.xy = 0x90;
+    sprintf(working_msg.txt,"    ");
+    //xQueueSend( q_lcd, (void *) &working_msg, portMAX_DELAY );
+    xQueueSendFromISR( q_lcd, (void *) &working_msg, &xHigherPriorityTaskWoken);
+}
+
+
 
 
 void gui_print_lcd_step(void){
 	type_q_lcd_element working_msg;
 	BaseType_t xHigherPriorityTaskWoken;
 
-static uint8_t step_pos,pred_step_pos;
+	static uint8_t step_pos,pred_step_pos;
 
 
-if(q_lcd){
-	step_pos = (uint8_t)(MIDI_start_status/6);
-	if(step_pos != pred_step_pos){
-		pred_step_pos = step_pos;
+	if(q_lcd){
+		step_pos = (uint8_t)(MIDI_start_status/6);
+		if(step_pos != pred_step_pos){
+			pred_step_pos = step_pos;
 
-		working_msg.xy = 0x01;
-		sprintf(working_msg.txt,"oooooooooooooooo");
+			working_msg.xy = 0x01;
+			sprintf(working_msg.txt,"oooooooooooooooo");
 
-		working_msg.txt[step_pos] = 'X';
+			working_msg.txt[step_pos] = 'x';
 
-		xQueueSendFromISR( q_lcd, (void *) &working_msg, &xHigherPriorityTaskWoken);
+			xQueueSendFromISR( q_lcd, (void *) &working_msg, &xHigherPriorityTaskWoken);
 
-	}
+		}
 
 
 	if(!(step_pos%4)){

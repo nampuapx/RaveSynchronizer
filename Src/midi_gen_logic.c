@@ -46,7 +46,7 @@ extLine_HandleTypeDef
 
 encoder_HandleTypeDef	enc01_struct;
 
-#define BUTTON_BLINK_DELAY 100
+#define BUTTON_BLINK_DELAY 50
 
 extern TIM_HandleTypeDef	htim1;
 #define SEC_IN_MIN	60
