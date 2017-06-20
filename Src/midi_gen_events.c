@@ -52,6 +52,8 @@ void clock_pulse_event_handler(void){
 		portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 	}
 
+	gui_print_lcd_step();
+
 }
 
 

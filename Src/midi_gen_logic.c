@@ -53,7 +53,7 @@ extern TIM_HandleTypeDef	htim1;
 #define MIDI_CLOCK_TIMER_PRESCALER	htim1.Init.Prescaler
 #define MIDI_CLOCK_TIMER_PERIOD		htim1.Init.Period
 
-#define TIMER_PRESCALER_VALUE	100
+#define TIMER_PRESCALER_VALUE	100 // don't change this!!!
 #define DEF_BPM		100
 #define BPM_MIN		30
 #define BPM_MAX		300
@@ -91,7 +91,7 @@ uint32_t	period_init_val = 0;
 
 	period_init_val /= bpm_val;
 
-	MIDI_CLOCK_TIMER_PRESCALER = TIMER_PRESCALER_VALUE;
+	MIDI_CLOCK_TIMER_PRESCALER = TIMER_PRESCALER_VALUE-1;
 	MIDI_CLOCK_TIMER_PERIOD = (uint16_t)period_init_val;
 
 

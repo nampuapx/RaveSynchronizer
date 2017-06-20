@@ -9,7 +9,7 @@
 #define GUI_H_
 
 
-#define SIMBOL_LCD_WIDTH	16
+#define SIMBOL_LCD_WIDTH	17
 #define SIMBOL_LCD_ROWS		2
 
 

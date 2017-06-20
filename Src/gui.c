@@ -11,7 +11,7 @@
 
 #include "gui.h"
 
-xQueueHandle q_lcd;
+xQueueHandle q_lcd = 0;
 
 
 
@@ -26,30 +26,96 @@ void gui_print_lcd_bpm(void){
     }else{
     	sprintf(working_msg.txt,"BPM EXT",bpm);
     }
-    xQueueSend( q_lcd, ( void * ) &working_msg, portMAX_DELAY );
+    xQueueSend( q_lcd, (void *) &working_msg, portMAX_DELAY );
 
 }
 
 
 
 
+void gui_print_lcd_step(void){
+	type_q_lcd_element working_msg;
+	BaseType_t xHigherPriorityTaskWoken;
+
+static uint8_t step_pos,pred_step_pos;
 
 
+if(q_lcd){
+	step_pos = (uint8_t)(MIDI_start_status/6);
+	if(step_pos != pred_step_pos){
+		pred_step_pos = step_pos;
+
+		working_msg.xy = 0x01;
+		sprintf(working_msg.txt,"oooooooooooooooo");
+
+		working_msg.txt[step_pos] = 'X';
+
+		xQueueSendFromISR( q_lcd, (void *) &working_msg, &xHigherPriorityTaskWoken);
+
+	}
 
 
+	if(!(step_pos%4)){
+					working_msg.xy = (0xf0);
+					sprintf(working_msg.txt,"%c",(step_pos>>2)+1);
 
+					xQueueSendFromISR( q_lcd, (void *) &working_msg, &xHigherPriorityTaskWoken);
 
+	}
 
+}
 
+//	if(q_lcd){
+//		step_pos = (uint8_t)(MIDI_start_status/12);
+//		if(step_pos != pred_step_pos){
+//			pred_step_pos = step_pos;
+//
+//			working_msg.xy = 0x01;
+//			sprintf(working_msg.txt,"OOOOOOOOOOOOOOOO");
+//
+//
+//			working_msg.txt[step_pos<<1] = '>';
+//			working_msg.txt[(step_pos<<1)+1] = '<';
+//
+//
+//			xQueueSendFromISR( q_lcd, (void *) &working_msg, &xHigherPriorityTaskWoken);
+//
+//		}
+//	}
 
+//
+//	if(q_lcd){
+//		step_pos = (uint8_t)(MIDI_start_status/12);
+//		if(step_pos != pred_step_pos){
+//			pred_step_pos = step_pos;
+//
+//			working_msg.xy = 0x01;
+//			sprintf(working_msg.txt,"                ");
+//			//sprintf(working_msg.txt,"<><><><><><><><>");
+//			//sprintf(&(working_msg.txt[step_pos<<1]),"%c%c",4,5);
+//
+//			if(step_pos%2){
+//				working_msg.txt[step_pos<<1] = '<';
+//				working_msg.txt[(step_pos<<1)+1] = '>';
+//			}else{
+//				working_msg.txt[step_pos<<1] = 4;
+//				working_msg.txt[(step_pos<<1)+1] = 5;
+//			}
+//
+//			xQueueSendFromISR( q_lcd, (void *) &working_msg, &xHigherPriorityTaskWoken);
+//
+//
+////			working_msg.xy = (uint8_t)(((step_pos)<<5)|0x01);
+////			if(!step_pos){
+////				sprintf(working_msg.txt,"%c%c",4,5);
+////			}else{
+////				sprintf(working_msg.txt,"<>");
+////			}
+////			xQueueSendFromISR( q_lcd, (void *) &working_msg, &xHigherPriorityTaskWoken);
+//		}
+//	}
 
-
-
-
-
-
-
-
+}
 
 
 
@@ -84,12 +150,20 @@ void displayKeyCodes(void) {
 
 
 
-const uint8_t bell[8]  = {0x4,0xe,0xe,0xe,0x1f,0x0,0x4};
-const uint8_t note[8]  = {0x2,0x3,0x2,0xe,0x1e,0xc,0x0};
-const uint8_t clock[8] = {0x0,0xe,0x15,0x17,0x11,0xe,0x0};
-const uint8_t heart[8] = {0x0,0xa,0x1f,0x1f,0xe,0x4,0x0};
-const uint8_t duck[8]  = {0x0,0xc,0x1d,0xf,0xf,0x6,0x0};
-const uint8_t check[8] = {0x0,0x1,0x3,0x16,0x1c,0x8,0x0};
+//const uint8_t bell[8]  = {0x4,0xe,0xe,0xe,0x1f,0x0,0x4};
+//const uint8_t note[8]  = {0x2,0x3,0x2,0xe,0x1e,0xc,0x0};
+//const uint8_t clock[8] = {0x0,0xe,0x15,0x17,0x11,0xe,0x0};
+//const uint8_t heart[8] = {0x0,0xa,0x1f,0x1f,0xe,0x4,0x0};
+
+const uint8_t b_01[8]  = {0x18,0x18,0x18,0x0,0x0,0x0,0x0};
+const uint8_t b_02[8]  = {0x3,0x3,0x3,0x0,0x0,0x0,0x0};
+const uint8_t b_03[8]  = {0x0,0x0,0x0,0x0,0x3,0x3,0x3};
+const uint8_t b_04[8]  = {0x0,0x0,0x0,0x0,0x18,0x18,0x18};
+
+
+
+const uint8_t ar_left[8]  = {0x1,0x3,0x7,0xf,0x7,0x3,0x1};
+const uint8_t ar_right[8] = {0x8,0xc,0xe,0xf,0xe,0xc,0x8};
 const uint8_t cross[8] = {0x0,0x1b,0xe,0x4,0xe,0x1b,0x0};
 const uint8_t retarrow[8] = {0x1,0x1,0x5,0x9,0x1f,0x8,0x4};
 
@@ -115,14 +189,15 @@ void lcd_Task(void){
 
 	LCDI2C_init(0x4e,SIMBOL_LCD_WIDTH,SIMBOL_LCD_ROWS);
 	LCDI2C_backlight();
-	LCDI2C_createChar(0, bell);
-	LCDI2C_createChar(1, note);
-	LCDI2C_createChar(2, clock);
-	LCDI2C_createChar(3, heart);
-	LCDI2C_createChar(4, duck);
-	LCDI2C_createChar(5, check);
-	LCDI2C_createChar(6, cross);
-	LCDI2C_createChar(7, retarrow);
+	LCDI2C_createChar(0, retarrow);
+	LCDI2C_createChar(1, b_01);
+	LCDI2C_createChar(2, b_02);
+	LCDI2C_createChar(3, b_03);
+	LCDI2C_createChar(4, b_04);
+	LCDI2C_createChar(5, ar_left);
+	LCDI2C_createChar(6, ar_right);
+	LCDI2C_createChar(7, cross);
+	LCDI2C_createChar(8, retarrow);
 	LCDI2C_clear();
 	  //LCDI2C_setCursor(0,0);
 	  //LCDI2C_write(4);
