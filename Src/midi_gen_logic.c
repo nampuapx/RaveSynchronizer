@@ -37,7 +37,9 @@
 
 extern uint8_t uartRX_byte;
 
-extLine_HandleTypeDef 	enc01_extLine_struct,
+extLine_HandleTypeDef
+
+						enc01_extLine_struct,
 						enc02_extLine_struct,
 						start_request__button_extLine_struct,
 						ExtInt_switch_extLine_struct;
@@ -124,7 +126,7 @@ void Perf_Task(void){
 	extLine_init(&start_request__button_extLine_struct, bttn_start_request_GPIO_Port, bttn_start_request_Pin);
 	extLine_init(&ExtInt_switch_extLine_struct, switch_ExtInt_GPIO_Port, switch_ExtInt_Pin);
 	extLine_init(&enc01_extLine_struct, enc01_ch1_GPIO_Port, enc01_ch1_Pin);
-	extLine_init(&enc01_extLine_struct, enc01_ch2_GPIO_Port, enc01_ch2_Pin);
+	extLine_init(&enc02_extLine_struct, enc01_ch2_GPIO_Port, enc01_ch2_Pin);
 
 	enc01_struct.line01 = &enc01_extLine_struct;
 	enc01_struct.line02 = &enc02_extLine_struct;
@@ -142,7 +144,7 @@ void Perf_Task(void){
 
 	  for(;;)
 	  {
-		  //encoder_handle(&enc01_struct);
+		  encoder_handle(&enc01_struct);
 
 
 //			if(extLine_get_new_state(&enc01_extLine_struct)){

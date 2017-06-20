@@ -5,7 +5,7 @@
  *      Author: koko
  */
 
-#define STUPID_ENC
+#define CLICKING_ENC
 
 #include "stm32f1xx_hal.h"
 #include "cmsis_os.h"
@@ -26,8 +26,9 @@ __weak void encoder_stepdown(encoder_HandleTypeDef * enc_struct){
 
  }
 
-_encoder_states esm[20];
-uint8_t to_esm = 0;
+//_encoder_states esm[30];
+//uint8_t to_esm = 0;
+
 
 _encoder_states get_encoder_states(encoder_HandleTypeDef * enc_struct){
 
@@ -53,7 +54,7 @@ void encoder_init(encoder_HandleTypeDef * enc_struct ){
 	enc_struct->encoder_states = get_encoder_states(enc_struct);
 }
 
-#ifdef PRECISE_ENC
+#ifdef NOT_CLICKING_ENC
 ///this code not worked
 // todo test
 void encoder_handle(encoder_HandleTypeDef * enc_struct){
@@ -83,10 +84,11 @@ void encoder_handle(encoder_HandleTypeDef * enc_struct){
 	}//switch
 
 }
-#elif defined STUPID_ENC
+#elif defined CLICKING_ENC
 
 void encoder_handle(encoder_HandleTypeDef * enc_struct){
 	volatile _encoder_states new_encoder_states;
+
 
 
 	if(extLine_get_new_state(enc_struct->line01)){
@@ -101,9 +103,9 @@ void encoder_handle(encoder_HandleTypeDef * enc_struct){
 		return;
 	}
 	//vv = new_encoder_states - enc_struct->encoder_states;
-	esm[to_esm] = new_encoder_states;
-	to_esm++;
-	to_esm%=20;
+//	esm[to_esm] = new_encoder_states;
+//	to_esm++;
+//	to_esm%=30;
 
 	if(enc_struct->encoder_states == one_one){
 

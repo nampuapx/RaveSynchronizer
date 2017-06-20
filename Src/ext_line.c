@@ -10,9 +10,12 @@
 
 
 
-#define ANTI_DREBEZG_VALUE  5
-
+#define ANTI_DREBEZG_VALUE  2
 #define ANTI_DREBEZG_VALUE_MIDDLE  127
+
+#define ANTI_DREBEZG_VALUE_MIDDLE_TOP  (ANTI_DREBEZG_VALUE_MIDDLE + ANTI_DREBEZG_VALUE)
+#define ANTI_DREBEZG_VALUE_MIDDLE_BOT  (ANTI_DREBEZG_VALUE_MIDDLE - ANTI_DREBEZG_VALUE)
+
 
 void extLine_init(	extLine_HandleTypeDef * extLine_Handle_struct,
 					GPIO_TypeDef* GPIOx,
@@ -39,8 +42,8 @@ uint8_t extLine_get_new_state(	extLine_HandleTypeDef * extLine_Handle_struct){
 			ext = 0;
 		}else{
 			extLine_Handle_struct->line_state_counter++;
-			if(extLine_Handle_struct->line_state_counter > (ANTI_DREBEZG_VALUE_MIDDLE + ANTI_DREBEZG_VALUE)){
-				extLine_Handle_struct->line_state_counter = (ANTI_DREBEZG_VALUE_MIDDLE + ANTI_DREBEZG_VALUE);
+			if(extLine_Handle_struct->line_state_counter > (ANTI_DREBEZG_VALUE_MIDDLE_TOP)){
+				extLine_Handle_struct->line_state_counter = (ANTI_DREBEZG_VALUE_MIDDLE_TOP);
 				extLine_Handle_struct->extLine_level_status = extLine_level_FULL;
 				//return (5);
 				ext = 5;
@@ -51,8 +54,8 @@ uint8_t extLine_get_new_state(	extLine_HandleTypeDef * extLine_Handle_struct){
 		if(extLine_Handle_struct->extLine_level_status){
 
 			extLine_Handle_struct->line_state_counter--;
-			if(extLine_Handle_struct->line_state_counter < (ANTI_DREBEZG_VALUE_MIDDLE - ANTI_DREBEZG_VALUE)){
-				extLine_Handle_struct->line_state_counter = (ANTI_DREBEZG_VALUE_MIDDLE - ANTI_DREBEZG_VALUE);
+			if(extLine_Handle_struct->line_state_counter < (ANTI_DREBEZG_VALUE_MIDDLE_BOT)){
+				extLine_Handle_struct->line_state_counter = (ANTI_DREBEZG_VALUE_MIDDLE_BOT);
 				extLine_Handle_struct->extLine_level_status = extLine_level_ZERO;
 				//return (5);
 				ext = 5;

@@ -19,7 +19,7 @@ extern uint16_t bpm;
 void gui_print_lcd_bpm(void){
 	type_q_lcd_element working_msg;
 
-    working_msg.xy = 0x50;
+    working_msg.xy = 0x00;
     sprintf(working_msg.txt,"BPM%3u",bpm);
     xQueueSend( q_lcd, ( void * ) &working_msg, portMAX_DELAY );
 
