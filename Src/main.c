@@ -49,18 +49,16 @@
 #include "main.h"
 #include "stm32f1xx_hal.h"
 #include "cmsis_os.h"
+#include "usb_device.h"
 
 /* USER CODE BEGIN Includes */
 #include <sys_main.h>
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
-CAN_HandleTypeDef hcan;
-
 I2C_HandleTypeDef hi2c1;
 
 SPI_HandleTypeDef hspi1;
-SPI_HandleTypeDef hspi2;
 
 TIM_HandleTypeDef htim1;
 
@@ -84,10 +82,8 @@ static void MX_GPIO_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_USART2_UART_Init(void);
-static void MX_I2C1_Init(void);
 static void MX_SPI1_Init(void);
-static void MX_SPI2_Init(void);
-static void MX_CAN_Init(void);
+static void MX_I2C1_Init(void);
 void StartDefaultTask(void const * argument);
 void StartLedTask(void const * argument);
 void Start_lcd_Task(void const * argument);
@@ -131,10 +127,8 @@ int main(void)
   MX_TIM1_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
-  MX_I2C1_Init();
   MX_SPI1_Init();
-  MX_SPI2_Init();
-  MX_CAN_Init();
+  MX_I2C1_Init();
 
   /* USER CODE BEGIN 2 */
 	Onboard_led_OFF();
@@ -210,6 +204,7 @@ void SystemClock_Config(void)
 
   RCC_OscInitTypeDef RCC_OscInitStruct;
   RCC_ClkInitTypeDef RCC_ClkInitStruct;
+  RCC_PeriphCLKInitTypeDef PeriphClkInit;
 
     /**Initializes the CPU, AHB and APB busses clocks 
     */
@@ -239,6 +234,13 @@ void SystemClock_Config(void)
     _Error_Handler(__FILE__, __LINE__);
   }
 
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USB;
+  PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
     /**Configure the Systick interrupt time 
     */
   HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
@@ -249,29 +251,6 @@ void SystemClock_Config(void)
 
   /* SysTick_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(SysTick_IRQn, 15, 0);
-}
-
-/* CAN init function */
-static void MX_CAN_Init(void)
-{
-
-  hcan.Instance = CAN1;
-  hcan.Init.Prescaler = 16;
-  hcan.Init.Mode = CAN_MODE_NORMAL;
-  hcan.Init.SJW = CAN_SJW_1TQ;
-  hcan.Init.BS1 = CAN_BS1_1TQ;
-  hcan.Init.BS2 = CAN_BS2_1TQ;
-  hcan.Init.TTCM = DISABLE;
-  hcan.Init.ABOM = DISABLE;
-  hcan.Init.AWUM = DISABLE;
-  hcan.Init.NART = DISABLE;
-  hcan.Init.RFLM = DISABLE;
-  hcan.Init.TXFP = DISABLE;
-  if (HAL_CAN_Init(&hcan) != HAL_OK)
-  {
-    _Error_Handler(__FILE__, __LINE__);
-  }
-
 }
 
 /* I2C1 init function */
@@ -311,29 +290,6 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
   hspi1.Init.CRCPolynomial = 10;
   if (HAL_SPI_Init(&hspi1) != HAL_OK)
-  {
-    _Error_Handler(__FILE__, __LINE__);
-  }
-
-}
-
-/* SPI2 init function */
-static void MX_SPI2_Init(void)
-{
-
-  hspi2.Instance = SPI2;
-  hspi2.Init.Mode = SPI_MODE_MASTER;
-  hspi2.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi2.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi2.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi2.Init.NSS = SPI_NSS_SOFT;
-  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
-  hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
-  hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi2.Init.CRCPolynomial = 10;
-  if (HAL_SPI_Init(&hspi2) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
@@ -441,10 +397,10 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_ONBOARD_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : bttn_start_request_Pin bttn_GlobalStart_Pin bttn_GlobalStop_Pin enc01_ch1_Pin 
-                           enc01_ch2_Pin */
-  GPIO_InitStruct.Pin = bttn_start_request_Pin|bttn_GlobalStart_Pin|bttn_GlobalStop_Pin|enc01_ch1_Pin 
-                          |enc01_ch2_Pin;
+  /*Configure GPIO pins : bttn_start_request_Pin bttn_GlobalStart_Pin bttn_GlobalStop_Pin switch_ExtInt_Pin 
+                           enc01_ch1_Pin enc01_ch2_Pin */
+  GPIO_InitStruct.Pin = bttn_start_request_Pin|bttn_GlobalStart_Pin|bttn_GlobalStop_Pin|switch_ExtInt_Pin 
+                          |enc01_ch1_Pin|enc01_ch2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -454,12 +410,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(lamp_01_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : switch_ExtInt_Pin */
-  GPIO_InitStruct.Pin = switch_ExtInt_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(switch_ExtInt_GPIO_Port, &GPIO_InitStruct);
 
 }
 
@@ -483,6 +433,8 @@ void Onboard_led_TOGG(void){
 /* StartDefaultTask function */
 void StartDefaultTask(void const * argument)
 {
+  /* init code for USB_DEVICE */
+  MX_USB_DEVICE_Init();
 
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
@@ -528,14 +480,11 @@ void Start_lcd_Task(void const * argument)
 {
   /* USER CODE BEGIN Start_lcd_Task */
   /* Infinite loop */
-
-//  for(;;)
-//  {
-//    osDelay(10);
-//  }
-	lcd_Task();
-
-  /* USER CODE END Start_lamp_Task */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END Start_lcd_Task */
 }
 
 /* Start_Perf_Task function */
