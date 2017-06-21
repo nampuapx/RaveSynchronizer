@@ -71,10 +71,10 @@
 /** @defgroup USBD_DESC_Private_Defines
   * @{
   */ 
-#define USBD_VID     1155
+#define USBD_VID     1156
 #define USBD_LANGID_STRING     1033
 #define USBD_MANUFACTURER_STRING     "nampuapx(c)"
-#define USBD_PID_FS     22336
+#define USBD_PID_FS     22338
 #define USBD_PRODUCT_STRING_FS     "nampuapx USB MIDIPort"
 #define USBD_SERIALNUMBER_STRING_FS     "00000000001A"
 #define USBD_CONFIGURATION_STRING_FS     "CDC Config"
