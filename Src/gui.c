@@ -18,6 +18,7 @@ xQueueHandle q_lcd = 0;
 
 extern uint16_t bpm;
 void gui_print_lcd_bpm(void){
+	return;
 	type_q_lcd_element working_msg;
 
     working_msg.xy = 0x00;
@@ -32,6 +33,7 @@ void gui_print_lcd_bpm(void){
 
 
 void gui_print_start_wait(void){
+	return;
 	type_q_lcd_element working_msg;
 
     working_msg.xy = 0x90;
@@ -40,6 +42,7 @@ void gui_print_start_wait(void){
 }
 
 void gui_print_start_wait_clear(void){
+	return;
 	type_q_lcd_element working_msg;
 	BaseType_t xHigherPriorityTaskWoken;
 
@@ -53,6 +56,7 @@ void gui_print_start_wait_clear(void){
 
 
 void gui_print_lcd_step(void){
+	return;
 	type_q_lcd_element working_msg;
 	BaseType_t xHigherPriorityTaskWoken;
 
