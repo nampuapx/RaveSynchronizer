@@ -102,6 +102,19 @@ void setHdlNoteOn(void (*fptr)(uint8_t ch, uint8_t note, uint8_t vel)){
 void setHdlCtlChange(void (*fptr)(uint8_t ch, uint8_t num, uint8_t value)){
   cbCtlChange = fptr;
 }
+extern USBD_HandleTypeDef hUsbDeviceFS;
+void sendMIDIClock(void){
+  buffer[0] = 0x0f;
+  buffer[1] = 0xf8;
+//  buffer[2] = 0x7f & note;
+//  buffer[3] = 0x7f & vel;
+  if(hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED){
+	  sendMidiMessage(buffer,4);
+	  USBD_MIDI_SendPacket();
+	  led_01_TOGG();
+  }
+}
+
 
 void sendNoteOn(uint8_t ch, uint8_t note, uint8_t vel){
   buffer[0] = 0x09;

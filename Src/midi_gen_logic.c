@@ -132,13 +132,13 @@ void Perf_Task(void){
 	enc01_struct.line01 = &enc01_extLine_struct;
 	enc01_struct.line02 = &enc02_extLine_struct;
 
-	//HAL_TIM_Base_Start_IT(&htim1);
+	HAL_TIM_Base_Start_IT(&htim1);
 
     if (HAL_UART_Receive_IT(&huart1, (uint8_t *)&uartRX_byte, 1) != HAL_OK) {
         Error_Handler();
     }
 
-    //bpm_hardware_timer_setup(100);
+    bpm_hardware_timer_setup(100);
 
     osDelay(2);
     gui_print_lcd_bpm();
@@ -169,18 +169,17 @@ void Perf_Task(void){
 			  }
 		  }//if(need_start){
 
-		  note_dede++;
-		  note_dede%=500;
-		  if(!note_dede){
-
-			  Onboard_led_TOGG();
-			  if(hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED){
-				  led_01_TOGG();
-				  sendNoteOn(2, 20, 55);
-				  processMidiMessage();
-			  }
-			  //USBD_MIDI_SendPacket();
-		  }
+//		  note_dede++;
+//		  note_dede%=500;
+//		  if(!note_dede){
+//
+//			  Onboard_led_TOGG();
+//			  if(hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED){
+//				  led_01_TOGG();
+//				  sendNoteOn(2, 20, 55);
+//				  USBD_MIDI_SendPacket();
+//			  }
+//		  }
 
 		  osDelay(1);
 
