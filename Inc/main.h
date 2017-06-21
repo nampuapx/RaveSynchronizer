@@ -68,6 +68,8 @@
 #define bttn_GlobalStop_GPIO_Port GPIOB
 #define switch_ExtInt_Pin GPIO_PIN_12
 #define switch_ExtInt_GPIO_Port GPIOB
+#define LED_01_Pin GPIO_PIN_8
+#define LED_01_GPIO_Port GPIOA
 #define enc01_ch1_Pin GPIO_PIN_8
 #define enc01_ch1_GPIO_Port GPIOB
 #define enc01_ch2_Pin GPIO_PIN_9
