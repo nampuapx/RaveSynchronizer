@@ -68,7 +68,7 @@ uint16_t MIDI_resturt_counter,MIDI_restart_value = DEFAULT_RESTART_STEPS_VALUE;
 
 uint8_t need_start = 0;
 
-_ext_int_state ext_int_state = internal_clock_and_transport;
+_ext_int_state ext_int_state = external_clock_and_transport;
 
 
 
@@ -124,31 +124,32 @@ void Perf_Task(void){
 //	uint16_t	note_dede = 0;
 
 	extLine_init(&start_request__button_extLine_struct, bttn_start_request_GPIO_Port, bttn_start_request_Pin);
-	extLine_init(&ExtInt_switch_extLine_struct, switch_ExtInt_GPIO_Port, switch_ExtInt_Pin);
-	extLine_init(&enc01_extLine_struct, enc01_ch1_GPIO_Port, enc01_ch1_Pin);
-	extLine_init(&enc02_extLine_struct, enc01_ch2_GPIO_Port, enc01_ch2_Pin);
+	//extLine_init(&ExtInt_switch_extLine_struct, switch_ExtInt_GPIO_Port, switch_ExtInt_Pin);
+	//extLine_init(&enc01_extLine_struct, enc01_ch1_GPIO_Port, enc01_ch1_Pin);
+	//extLine_init(&enc02_extLine_struct, enc01_ch2_GPIO_Port, enc01_ch2_Pin);
 
-	encoder_init(&enc01_struct, &enc01_extLine_struct,&enc02_extLine_struct);
+	//encoder_init(&enc01_struct, &enc01_extLine_struct,&enc02_extLine_struct);
 
+	UART_2_MAX485_switch();
 
-	HAL_TIM_Base_Start_IT(&htim1);
+	//HAL_TIM_Base_Start_IT(&htim1);
 
     if (HAL_UART_Receive_IT(&huart1, (uint8_t *)&uartRX_byte, 1) != HAL_OK) {
         Error_Handler();
     }
 
-    bpm_hardware_timer_setup(100);
+    //bpm_hardware_timer_setup(100);
 
-    osDelay(2);
+    //osDelay(2);
     gui_print_lcd_bpm();
 
 	for(;;){
 
-		  encoder_handle(&enc01_struct);
+		  //encoder_handle(&enc01_struct);
 
 		  start_request_button_handle(&start_request__button_extLine_struct);
 
-		  ExtInt_switch_handle(&ExtInt_switch_extLine_struct);
+		  ///ExtInt_switch_handle(&ExtInt_switch_extLine_struct);
 		//  need_start = 5;
 		  if(need_start){
 			  if(led_trigger){

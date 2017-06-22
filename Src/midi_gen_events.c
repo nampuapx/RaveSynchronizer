@@ -16,9 +16,9 @@ void clock_pulse_event_handler(void){
 	BaseType_t xHigherPriorityTaskWoken;
 
 
-	UART_2_plain_MIDI_select();
-	put_MIDI_clock();
-	UART_2_MAX485_switch();
+	//UART_2_plain_MIDI_select();
+	//put_MIDI_clock();
+	//UART_2_MAX485_switch();
 	put_MIDI_clock();
 
 	USBMIDIsend_MIDIClock(0);
@@ -34,7 +34,7 @@ void clock_pulse_event_handler(void){
 
 
 		if(need_start){
-			UART_2_plain_MIDI_select();
+			//UART_2_plain_MIDI_select();
 			put_MIDI_start();
 
 			USBMIDIsend_MIDIStart(0);
@@ -74,9 +74,9 @@ void start_event_handler(void){
 	BaseType_t xHigherPriorityTaskWoken;
 
 
-	UART_2_plain_MIDI_select();
-	put_MIDI_start();
-	UART_2_MAX485_switch();
+//	UART_2_plain_MIDI_select();
+//	put_MIDI_start();
+//	UART_2_MAX485_switch();
 	put_MIDI_start();
 
 	USBMIDIsend_MIDIStart(0);
