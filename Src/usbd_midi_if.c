@@ -11,18 +11,16 @@
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_midi_if.h"
 #include "stm32f1xx_hal.h"
-#include "queue32.h"
+//#include "queue32.h"
 
 // basic midi rx/tx functions
 static uint16_t MIDI_DataRx(uint8_t *msg, uint16_t length);
 static uint16_t MIDI_DataTx(uint8_t *msg, uint16_t length);
 
 // from mi:muz (Internal)
-stB4Arrq rxq;
+//stB4Arrq rxq;
+//
 
-void (*cbNoteOff)(uint8_t ch, uint8_t note, uint8_t vel);
-void (*cbNoteOn)(uint8_t ch, uint8_t note, uint8_t vel);
-void (*cbCtlChange)(uint8_t ch, uint8_t num, uint8_t value);
 
 static int checkMidiMessage(uint8_t *pMidi);
 
@@ -33,15 +31,18 @@ USBD_MIDI_ItfTypeDef USBD_Interface_fops_FS =
 };
 
 static uint16_t MIDI_DataRx(uint8_t *msg, uint16_t length){
-  uint16_t cnt;
-  uint16_t msgs = length / 4;
-  uint16_t chk = length % 4;
-  if(chk == 0){
-    for(cnt = 0;cnt < msgs;cnt ++){
-      b4arrq_push(&rxq,((uint32_t *)msg)+cnt);
-    }
-  }
-  return 0;
+//  uint16_t cnt;
+//  uint16_t msgs = length / 4;
+//  uint16_t chk = length % 4;
+//  if(chk == 0){
+//    for(cnt = 0;cnt < msgs;cnt ++){
+//      b4arrq_push(&rxq,((uint32_t *)msg)+cnt);
+//    }
+//  }
+//  return 0;
+	led_01_TOGG();
+
+
 }
 
 void sendMidiMessage(uint8_t *msg, uint16_t size){
@@ -69,41 +70,42 @@ static uint16_t MIDI_DataTx(uint8_t *msg, uint16_t length){
 }
 
 // from mi:muz (Internal)
-static int checkMidiMessage(uint8_t *pMidi){
-  if(((*(pMidi + 1) & 0xf0)== 0x90)&&(*(pMidi + 3) != 0)){
-    return 2;
-  }else if(((*(pMidi + 1) & 0xf0)== 0x90)&&(*(pMidi + 3) == 0)){
-    return 1;
-  }else if((*(pMidi + 1) & 0xf0)== 0x80){
-    return 1;
-  }else if((*(pMidi + 1) & 0xf0)== 0xb0){
-    return 3;
-  }else{
-    return 0;
-  }
-}
+//static int checkMidiMessage(uint8_t *pMidi){
+//  if(((*(pMidi + 1) & 0xf0)== 0x90)&&(*(pMidi + 3) != 0)){
+//    return 2;
+//  }else if(((*(pMidi + 1) & 0xf0)== 0x90)&&(*(pMidi + 3) == 0)){
+//    return 1;
+//  }else if((*(pMidi + 1) & 0xf0)== 0x80){
+//    return 1;
+//  }else if((*(pMidi + 1) & 0xf0)== 0xb0){
+//    return 3;
+//  }else{
+//    return 0;
+//  }
+//}
 
 
 // from mi:muz (Interface functions)
 static uint8_t buffer[4];
 
-void mimuz_init(void){
-  b4arrq_init(&rxq);
-}
+//void mimuz_init(void){
+//  b4arrq_init(&rxq);
+//}
 
-void setHdlNoteOff(void (*fptr)(uint8_t ch, uint8_t note, uint8_t vel)){
-  cbNoteOff = fptr;
-}
-
-void setHdlNoteOn(void (*fptr)(uint8_t ch, uint8_t note, uint8_t vel)){
-  cbNoteOn = fptr;
-}
-
-void setHdlCtlChange(void (*fptr)(uint8_t ch, uint8_t num, uint8_t value)){
-  cbCtlChange = fptr;
-}
+//void setHdlNoteOff(void (*fptr)(uint8_t ch, uint8_t note, uint8_t vel)){
+//  cbNoteOff = fptr;
+//}
+//
+//void setHdlNoteOn(void (*fptr)(uint8_t ch, uint8_t note, uint8_t vel)){
+//  cbNoteOn = fptr;
+//}
+//
+//void setHdlCtlChange(void (*fptr)(uint8_t ch, uint8_t num, uint8_t value)){
+//  cbCtlChange = fptr;
+//}
 extern USBD_HandleTypeDef hUsbDeviceFS;
-void sendMIDIClock(void){
+
+void USBMIDIsend_MIDIClock(void){
   buffer[0] = 0x0f;
   buffer[1] = 0xf8;
 //  buffer[2] = 0x7f & note;
@@ -111,7 +113,7 @@ void sendMIDIClock(void){
   if(hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED){
 	  sendMidiMessage(buffer,4);
 	  USBD_MIDI_SendPacket();
-	  led_01_TOGG();
+	  //led_01_TOGG();
   }
 }
 
@@ -140,28 +142,28 @@ void sendCtlChange(uint8_t ch, uint8_t num, uint8_t value){
   sendMidiMessage(buffer,4);
 }
 
-void processMidiMessage(){
-  uint8_t *pbuf;
-  uint8_t kindmessage;
-  // Rx
-  if(rxq.num > 0){
-    pbuf = (uint8_t *)b4arrq_pop(&rxq);
-    kindmessage = checkMidiMessage(pbuf);
-    if(kindmessage == 1){
-      if(cbNoteOff != NULL){
-        (*cbNoteOff)(*(pbuf+1)&0x0f,*(pbuf+2)&0x7f,*(pbuf+3)&0x7f);
-      }
-    }else if(kindmessage == 2){
-      if(cbNoteOn != NULL){
-        (*cbNoteOn)(*(pbuf+1)&0x0f,*(pbuf+2)&0x7f,*(pbuf+3)&0x7f);
-      }
-    }else if(kindmessage == 3){
-      if(cbCtlChange != NULL){
-        (*cbCtlChange)(*(pbuf+1)&0x0f,*(pbuf+2)&0x7f,*(pbuf+3)&0x7f);
-      }
-    }
-  }
-  // Tx
-  USBD_MIDI_SendPacket();
-}
+//void processMidiMessage(){
+//  uint8_t *pbuf;
+//  uint8_t kindmessage;
+//  // Rx
+//  if(rxq.num > 0){
+//    pbuf = (uint8_t *)b4arrq_pop(&rxq);
+//    kindmessage = checkMidiMessage(pbuf);
+//    if(kindmessage == 1){
+//      if(cbNoteOff != NULL){
+//        (*cbNoteOff)(*(pbuf+1)&0x0f,*(pbuf+2)&0x7f,*(pbuf+3)&0x7f);
+//      }
+//    }else if(kindmessage == 2){
+//      if(cbNoteOn != NULL){
+//        (*cbNoteOn)(*(pbuf+1)&0x0f,*(pbuf+2)&0x7f,*(pbuf+3)&0x7f);
+//      }
+//    }else if(kindmessage == 3){
+//      if(cbCtlChange != NULL){
+//        (*cbCtlChange)(*(pbuf+1)&0x0f,*(pbuf+2)&0x7f,*(pbuf+3)&0x7f);
+//      }
+//    }
+//  }
+//  // Tx
+//  USBD_MIDI_SendPacket();
+//}
 

@@ -21,7 +21,7 @@ void clock_pulse_event_handler(void){
 	UART_2_MAX485_switch();
 	put_MIDI_clock();
 
-	sendMIDIClock();
+	USBMIDIsend_MIDIClock();
 
 
 	MIDI_start_status++;

@@ -24,7 +24,7 @@
 #define MIDI_DATA_FS_MAX_PACKET_SIZE                 64  /* Endpoint IN & OUT Packet size */
 #define MIDI_CMD_PACKET_SIZE                         8  /* Control Endpoint Packet size */ 
 
-#define USB_MIDI_CONFIG_DESC_SIZ                    101
+
 #define MIDI_DATA_IN_PACKET_SIZE                    MIDI_DATA_FS_MAX_PACKET_SIZE
 #define MIDI_DATA_OUT_PACKET_SIZE                   MIDI_DATA_FS_MAX_PACKET_SIZE
 #define APP_RX_DATA_SIZE               				((MIDI_DATA_FS_MAX_PACKET_SIZE) * 4) //2048->256

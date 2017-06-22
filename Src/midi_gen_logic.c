@@ -27,7 +27,6 @@
 
 #include "stm32f1xx_hal.h"
 #include "cmsis_os.h"
-#include "ext_line.h"
 #include "encoder.h"
 #include "MIDI_lib\midi_lib.h"
 #include <sys_main.h>
@@ -188,16 +187,6 @@ void Perf_Task(void){
 
 
 void TIM1_PeriodElapsedCallback(void){
-
-//	BaseType_t xHigherPriorityTaskWoken;
-//
-//
-//	xHigherPriorityTaskWoken = pdFALSE;
-//	xTaskNotifyFromISR( lamp_TaskHandle,
-//							( 1UL << 0UL ),
-//							eSetBits,
-//							&xHigherPriorityTaskWoken );
-//	portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 
 
 	if(ext_int_state == internal_clock_and_transport){
