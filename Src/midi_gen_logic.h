@@ -16,7 +16,7 @@ typedef enum{
 }_ext_int_state;
 
 extern _ext_int_state ext_int_state;
-
+extern uint16_t bpm;
 
 extern uint8_t MIDI_start_status;
 extern uint16_t MIDI_resturt_counter,MIDI_restart_value;

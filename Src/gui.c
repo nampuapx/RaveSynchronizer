@@ -17,7 +17,7 @@ xQueueHandle q_lcd = 0;
 
 
 
-extern uint16_t bpm;
+
 void gui_print_lcd_bpm(void){
 #ifdef GUI_DISABLE
 	return;
@@ -215,7 +215,7 @@ void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
 
 void lcd_Task(void){
 
-	uint32_t ulNotifiedValue;
+
 	type_q_lcd_element working_msg;
 	q_lcd = xQueueCreate( 8, sizeof( type_q_lcd_element ) );
 
@@ -250,24 +250,4 @@ void lcd_Task(void){
 
 
 
-
-
-		for(;;)
-		{
-			xTaskNotifyWait( 	0x00,      /* Don't clear any notification bits on entry. */
-								0xffffffff , /* Reset the notification value to 0 on exit. */
-								&ulNotifiedValue, /* Notified value pass out in
-												  ulNotifiedValue. */
-								portMAX_DELAY );  /* Block indefinitely. */
-
-
-
-//
-//		HAL_GPIO_WritePin(lamp_01_GPIO_Port, lamp_01_Pin, GPIO_PIN_SET);
-//		osDelay(100);
-//		HAL_GPIO_WritePin(lamp_01_GPIO_Port, lamp_01_Pin, GPIO_PIN_RESET);
-						Onboard_led_ON();
-						osDelay(20);
-						Onboard_led_OFF();
-		}
 }

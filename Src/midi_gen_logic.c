@@ -137,7 +137,7 @@ void Perf_Task(void){
         Error_Handler();
     }
 
-    bpm_hardware_timer_setup(100);
+    bpm_hardware_timer_setup(bpm);
 
     osDelay(2);
     gui_print_lcd_bpm();
