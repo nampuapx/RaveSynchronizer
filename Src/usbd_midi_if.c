@@ -103,18 +103,16 @@ static uint8_t buffer[4];
 //void setHdlCtlChange(void (*fptr)(uint8_t ch, uint8_t num, uint8_t value)){
 //  cbCtlChange = fptr;
 //}
-extern USBD_HandleTypeDef hUsbDeviceFS;
 
-void USBMIDIsend_MIDIClock(void){
-  buffer[0] = 0x0f;
+//extern USBD_HandleTypeDef hUsbDeviceFS;
+void USBMIDIsend_MIDIClock(uint8_t jack_num){
+  buffer[0] = (jack_num<<4) | 0x0f;
   buffer[1] = 0xf8;
+  sendMidiMessage(buffer,4);
 //  buffer[2] = 0x7f & note;
 //  buffer[3] = 0x7f & vel;
-  if(hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED){
-	  sendMidiMessage(buffer,4);
-	  USBD_MIDI_SendPacket();
 	  //led_01_TOGG();
-  }
+//  }
 }
 
 

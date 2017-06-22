@@ -72,13 +72,13 @@
   * @{
   */ 
 #define USBD_VID     1156
-#define USBD_LANGID_STRING     1033
-#define USBD_MANUFACTURER_STRING     "nampuapx(c)"
+#define USBD_LANGID_STRING     0x0409		//English (United States)
+#define USBD_MANUFACTURER_STRING     "assunMusic"
 #define USBD_PID_FS     22338
-#define USBD_PRODUCT_STRING_FS     "nampuapx USB MIDIPort"
-#define USBD_SERIALNUMBER_STRING_FS     "00000000001A"
-#define USBD_CONFIGURATION_STRING_FS     "CDC Config"
-#define USBD_INTERFACE_STRING_FS     "CDC Interface"
+#define USBD_PRODUCT_STRING_FS     "assunMusicUSBMIDIPort"
+#define USBD_SERIALNUMBER_STRING_FS     "000866998000"
+#define USBD_CONFIGURATION_STRING_FS     "MIDI Config"
+#define USBD_INTERFACE_STRING_FS     "MIDI Interface"
 
 /* USER CODE BEGIN 0 */
 
