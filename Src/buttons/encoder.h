@@ -26,4 +26,8 @@ typedef struct
 	extLine_HandleTypeDef *line02;
 }encoder_HandleTypeDef;
 
+
+void encoder_init(encoder_HandleTypeDef * enc_struct, extLine_HandleTypeDef * extLine_struct01,extLine_HandleTypeDef * extLine_struct02);
+void encoder_handle(encoder_HandleTypeDef * enc_struct);
+
 #endif /* ENCODER_H_ */

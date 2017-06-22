@@ -10,6 +10,7 @@
 #include "midi_gen_logic.h"
 
 #include "gui.h"
+#include "LiquidCrystal_I2C.h"
 
 xQueueHandle q_lcd = 0;
 
@@ -25,7 +26,7 @@ void gui_print_lcd_bpm(void){
     if(ext_int_state == internal_clock_and_transport){
     	sprintf(working_msg.txt,"BPM %3u",bpm);
     }else{
-    	sprintf(working_msg.txt,"BPM EXT",bpm);
+    	sprintf(working_msg.txt,"BPM EXT");
     }
     xQueueSend( q_lcd, (void *) &working_msg, portMAX_DELAY );
 
@@ -147,29 +148,29 @@ void gui_print_lcd_step(void){
 
 
 
-
-void displayKeyCodes(void) {
-  uint8_t i = 0;
-  while (1) {
-    LCDI2C_clear();
-    //LCDI2C_setCursor(2,2);
-    //LCDI2C_write_String("TEN Electronics");
-    LCDI2C_setCursor(0, 0);
-	char buf[10];
-	itoa(i, buf, 10);
-    LCDI2C_write_String("Cds 0x"); LCDI2C_write_String(buf);
-	itoa(i+19, buf, 10);
-    LCDI2C_write_String("-0x"); LCDI2C_write_String(buf);
-    LCDI2C_setCursor(0, 1);
-    int j;
-    for (j=0; j<20; j++) {
-      LCDI2C_write(i+j);
-    }
-    i+=16;
-    if (i<15) break;
-    osDelay(700);
-  }
-}
+//
+//void displayKeyCodes(void) {
+//  uint8_t i = 0;
+//  while (1) {
+//    LCDI2C_clear();
+//    //LCDI2C_setCursor(2,2);
+//    //LCDI2C_write_String("TEN Electronics");
+//    LCDI2C_setCursor(0, 0);
+//	char buf[10];
+//	itoa(i, buf, 10);
+//    LCDI2C_write_String("Cds 0x"); LCDI2C_write_String(buf);
+//	itoa(i+19, buf, 10);
+//    LCDI2C_write_String("-0x"); LCDI2C_write_String(buf);
+//    LCDI2C_setCursor(0, 1);
+//    int j;
+//    for (j=0; j<20; j++) {
+//      LCDI2C_write(i+j);
+//    }
+//    i+=16;
+//    if (i<15) break;
+//    osDelay(700);
+//  }
+//}
 
 
 
@@ -212,15 +213,15 @@ void lcd_Task(void){
 
 	LCDI2C_init(0x4e,SIMBOL_LCD_WIDTH,SIMBOL_LCD_ROWS);
 	LCDI2C_backlight();
-	LCDI2C_createChar(0, retarrow);
-	LCDI2C_createChar(1, b_01);
-	LCDI2C_createChar(2, b_02);
-	LCDI2C_createChar(3, b_03);
-	LCDI2C_createChar(4, b_04);
-	LCDI2C_createChar(5, ar_left);
-	LCDI2C_createChar(6, ar_right);
-	LCDI2C_createChar(7, cross);
-	LCDI2C_createChar(8, retarrow);
+	LCDI2C_createChar(0, (uint8_t*)retarrow);
+	LCDI2C_createChar(1, (uint8_t*)b_01);
+	LCDI2C_createChar(2, (uint8_t*)b_02);
+	LCDI2C_createChar(3, (uint8_t*)b_03);
+	LCDI2C_createChar(4, (uint8_t*)b_04);
+	LCDI2C_createChar(5, (uint8_t*)ar_left);
+	LCDI2C_createChar(6, (uint8_t*)ar_right);
+	LCDI2C_createChar(7, (uint8_t*)cross);
+	LCDI2C_createChar(8, (uint8_t*)retarrow);
 	LCDI2C_clear();
 	  //LCDI2C_setCursor(0,0);
 	  //LCDI2C_write(4);

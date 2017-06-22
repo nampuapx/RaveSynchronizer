@@ -47,6 +47,7 @@ void little_buff_add(uint8_t in){
 	uint8_t tt;
 	_uarts_buff * to_uarts_buff;
 
+	to_uarts_buff = &uarts_buff_2_max485;
 	if(UART_Handle_selector == &UART2MAX485){
 		to_uarts_buff = &uarts_buff_2_max485;
 	}else if(UART_Handle_selector == &UART2PLAIN_MIDI){

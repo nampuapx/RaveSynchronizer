@@ -16,4 +16,14 @@ extern osThreadId lcd_TaskHandle;
 extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart2;
 
+
+void Onboard_led_ON(void);
+void Onboard_led_OFF(void);
+void Onboard_led_TOGG(void);
+void led_01_ON(void);
+void led_01_OFF(void);
+void led_01_TOGG(void);
+
+
+
 #endif /* SYS_MAIN_H_ */

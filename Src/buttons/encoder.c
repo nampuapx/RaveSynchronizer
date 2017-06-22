@@ -49,8 +49,9 @@ _encoder_states get_encoder_states(encoder_HandleTypeDef * enc_struct){
 
 
 
-void encoder_init(encoder_HandleTypeDef * enc_struct ){
-
+void encoder_init(encoder_HandleTypeDef * enc_struct, extLine_HandleTypeDef * extLine_struct01,extLine_HandleTypeDef * extLine_struct02){
+	enc_struct->line01 = extLine_struct01;
+	enc_struct->line02 = extLine_struct02;
 	enc_struct->encoder_states = get_encoder_states(enc_struct);
 }
 

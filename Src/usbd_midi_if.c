@@ -11,6 +11,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_midi_if.h"
 #include "stm32f1xx_hal.h"
+#include "MIDI_lib\midi_lib.h"
+
+
 //#include "queue32.h"
 
 // basic midi rx/tx functions
@@ -40,7 +43,7 @@ static uint16_t MIDI_DataRx(uint8_t *msg, uint16_t length){
 //    }
 //  }
 //  return 0;
-	led_01_TOGG();
+//	led_01_TOGG();
 
 
 }
@@ -69,99 +72,45 @@ static uint16_t MIDI_DataTx(uint8_t *msg, uint16_t length){
   return USBD_OK;
 }
 
-// from mi:muz (Internal)
-//static int checkMidiMessage(uint8_t *pMidi){
-//  if(((*(pMidi + 1) & 0xf0)== 0x90)&&(*(pMidi + 3) != 0)){
-//    return 2;
-//  }else if(((*(pMidi + 1) & 0xf0)== 0x90)&&(*(pMidi + 3) == 0)){
-//    return 1;
-//  }else if((*(pMidi + 1) & 0xf0)== 0x80){
-//    return 1;
-//  }else if((*(pMidi + 1) & 0xf0)== 0xb0){
-//    return 3;
-//  }else{
-//    return 0;
-//  }
-//}
 
 
-// from mi:muz (Interface functions)
-static uint8_t buffer[4];
+static uint8_t mbuffer[4];
 
-//void mimuz_init(void){
-//  b4arrq_init(&rxq);
-//}
-
-//void setHdlNoteOff(void (*fptr)(uint8_t ch, uint8_t note, uint8_t vel)){
-//  cbNoteOff = fptr;
-//}
-//
-//void setHdlNoteOn(void (*fptr)(uint8_t ch, uint8_t note, uint8_t vel)){
-//  cbNoteOn = fptr;
-//}
-//
-//void setHdlCtlChange(void (*fptr)(uint8_t ch, uint8_t num, uint8_t value)){
-//  cbCtlChange = fptr;
-//}
 
 //extern USBD_HandleTypeDef hUsbDeviceFS;
 void USBMIDIsend_MIDIClock(uint8_t jack_num){
-  buffer[0] = (jack_num<<4) | 0x0f;
-  buffer[1] = 0xf8;
-  sendMidiMessage(buffer,4);
+  mbuffer[0] = (jack_num<<4) | 0x0f;
+  mbuffer[1] = MIDI_REAL_TIME_Clock;
+  sendMidiMessage(mbuffer,4);
+}
+void USBMIDIsend_MIDIStart(uint8_t jack_num){
+  mbuffer[0] = (jack_num<<4) | 0x0f;
+  mbuffer[1] = MIDI_REAL_TIME_Start;
+  sendMidiMessage(mbuffer,4);
+}
+
+//void sendNoteOn(uint8_t ch, uint8_t note, uint8_t vel){
+//  buffer[0] = 0x09;
+//  buffer[1] = 0x90 | ch;
 //  buffer[2] = 0x7f & note;
 //  buffer[3] = 0x7f & vel;
-	  //led_01_TOGG();
-//  }
-}
-
-
-void sendNoteOn(uint8_t ch, uint8_t note, uint8_t vel){
-  buffer[0] = 0x09;
-  buffer[1] = 0x90 | ch;
-  buffer[2] = 0x7f & note;
-  buffer[3] = 0x7f & vel;
-  sendMidiMessage(buffer,4);
-}
-
-void sendNoteOff(uint8_t ch, uint8_t note){
-  buffer[0] = 0x08;
-  buffer[1] = 0x80 | ch;
-  buffer[2] = 0x7f & note;
-  buffer[3] = 0;
-  sendMidiMessage(buffer,4);
-}
-
-void sendCtlChange(uint8_t ch, uint8_t num, uint8_t value){
-  buffer[0] = 0x0b;
-  buffer[1] = 0xb0 | ch;
-  buffer[2] = 0x7f & num;
-  buffer[3] = 0x7f & value;
-  sendMidiMessage(buffer,4);
-}
-
-//void processMidiMessage(){
-//  uint8_t *pbuf;
-//  uint8_t kindmessage;
-//  // Rx
-//  if(rxq.num > 0){
-//    pbuf = (uint8_t *)b4arrq_pop(&rxq);
-//    kindmessage = checkMidiMessage(pbuf);
-//    if(kindmessage == 1){
-//      if(cbNoteOff != NULL){
-//        (*cbNoteOff)(*(pbuf+1)&0x0f,*(pbuf+2)&0x7f,*(pbuf+3)&0x7f);
-//      }
-//    }else if(kindmessage == 2){
-//      if(cbNoteOn != NULL){
-//        (*cbNoteOn)(*(pbuf+1)&0x0f,*(pbuf+2)&0x7f,*(pbuf+3)&0x7f);
-//      }
-//    }else if(kindmessage == 3){
-//      if(cbCtlChange != NULL){
-//        (*cbCtlChange)(*(pbuf+1)&0x0f,*(pbuf+2)&0x7f,*(pbuf+3)&0x7f);
-//      }
-//    }
-//  }
-//  // Tx
-//  USBD_MIDI_SendPacket();
+//  sendMidiMessage(buffer,4);
 //}
+//
+//void sendNoteOff(uint8_t ch, uint8_t note){
+//  buffer[0] = 0x08;
+//  buffer[1] = 0x80 | ch;
+//  buffer[2] = 0x7f & note;
+//  buffer[3] = 0;
+//  sendMidiMessage(buffer,4);
+//}
+//
+//void sendCtlChange(uint8_t ch, uint8_t num, uint8_t value){
+//  buffer[0] = 0x0b;
+//  buffer[1] = 0xb0 | ch;
+//  buffer[2] = 0x7f & num;
+//  buffer[3] = 0x7f & value;
+//  sendMidiMessage(buffer,4);
+//}
+
 

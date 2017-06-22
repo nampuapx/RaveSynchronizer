@@ -120,16 +120,16 @@ void encoder_stepdown(encoder_HandleTypeDef * enc_struct){
 
 extern USBD_HandleTypeDef hUsbDeviceFS;
 void Perf_Task(void){
-	uint8_t	led_trigger,led_trigger_val;
-	uint16_t	note_dede = 0;
+	uint8_t	led_trigger=0,led_trigger_val=0;
+//	uint16_t	note_dede = 0;
 
 	extLine_init(&start_request__button_extLine_struct, bttn_start_request_GPIO_Port, bttn_start_request_Pin);
 	extLine_init(&ExtInt_switch_extLine_struct, switch_ExtInt_GPIO_Port, switch_ExtInt_Pin);
 	extLine_init(&enc01_extLine_struct, enc01_ch1_GPIO_Port, enc01_ch1_Pin);
 	extLine_init(&enc02_extLine_struct, enc01_ch2_GPIO_Port, enc01_ch2_Pin);
 
-	enc01_struct.line01 = &enc01_extLine_struct;
-	enc01_struct.line02 = &enc02_extLine_struct;
+	encoder_init(&enc01_struct, &enc01_extLine_struct,&enc02_extLine_struct);
+
 
 	HAL_TIM_Base_Start_IT(&htim1);
 
@@ -142,8 +142,8 @@ void Perf_Task(void){
     osDelay(2);
     gui_print_lcd_bpm();
 
-	  for(;;)
-	  {
+	for(;;){
+
 		  encoder_handle(&enc01_struct);
 
 		  start_request_button_handle(&start_request__button_extLine_struct);
@@ -182,7 +182,7 @@ void Perf_Task(void){
 
 		  osDelay(1);
 
-	  }
+	}
 }
 
 
