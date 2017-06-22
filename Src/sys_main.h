@@ -9,6 +9,9 @@
 #define SYS_MAIN_H_
 
 #include "cmsis_os.h"
+
+//#define GUI_DISABLE
+
 extern osThreadId LedTaskHandle;
 extern UART_HandleTypeDef huart1;
 extern osThreadId lcd_TaskHandle;

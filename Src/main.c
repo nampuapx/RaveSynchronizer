@@ -529,7 +529,8 @@ void Start_lcd_Task(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	  lcd_Task();
+    //osDelay(1);
   }
   /* USER CODE END Start_lcd_Task */
 }
