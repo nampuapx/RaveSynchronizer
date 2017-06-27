@@ -16,11 +16,16 @@
 void start_request_button_handle(extLine_HandleTypeDef *start_button_extLine_struct){
 	if(extLine_get_new_state(start_button_extLine_struct)){
 		if(start_button_extLine_struct->extLine_level_status == extLine_level_ZERO){
-			need_start = 5;
-			gui_print_start_wait();
+			if(need_start){
+				need_start = 0;
+				Onboard_led_OFF();
+				gui_print_start_wait_clear();
+			}else{
+				need_start = 5;
+				gui_print_start_wait();
+			}
 		}
 	}
-
 }
 
 
@@ -48,7 +53,6 @@ ExtInt_switch_handle(extLine_HandleTypeDef *start_button_extLine_struct){
 			gui_print_lcd_bpm();
 		}
 	}
-
 }
 
 

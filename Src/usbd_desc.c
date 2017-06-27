@@ -71,11 +71,10 @@
 /** @defgroup USBD_DESC_Private_Defines
   * @{
   */ 
-#define USBD_VID     1156
+#define USBD_VID     2235
 #define USBD_LANGID_STRING     0x0409		//English (United States)
-#define USBD_MANUFACTURER_STRING     "assunMusic"
-#define USBD_PID_FS     22338
-#define USBD_PRODUCT_STRING_FS     "assunMusicUSBMIDIPort"
+#define USBD_MANUFACTURER_STRING     "assMusic"
+#define USBD_PID_FS     22358
 #define USBD_SERIALNUMBER_STRING_FS     "000866998000"
 #define USBD_CONFIGURATION_STRING_FS     "MIDI Config"
 #define USBD_INTERFACE_STRING_FS     "MIDI Interface"
@@ -216,11 +215,11 @@ uint8_t *  USBD_FS_ProductStrDescriptor( USBD_SpeedTypeDef speed , uint16_t *len
 {
   if(speed == 0)
   {   
-    USBD_GetString (USBD_PRODUCT_STRING_FS, USBD_StrDesc, length);
+	 USBD_GetString (vidnoe_dev_name, USBD_StrDesc, length);
   }
   else
   {
-    USBD_GetString (USBD_PRODUCT_STRING_FS, USBD_StrDesc, length);    
+    USBD_GetString (vidnoe_dev_name, USBD_StrDesc, length);
   }
   return USBD_StrDesc;
 }
