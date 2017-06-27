@@ -64,7 +64,7 @@ uint16_t bpm =  DEF_BPM;
 
 #define DEFAULT_RESTART_STEPS_VALUE	(MIDI_CLOCK_PER_BEAT * 4) //16 steps
 uint8_t MIDI_start_status = 0;
-uint16_t MIDI_resturt_counter,MIDI_restart_value = DEFAULT_RESTART_STEPS_VALUE;
+uint16_t MIDI_restart_value = DEFAULT_RESTART_STEPS_VALUE;
 
 uint8_t need_start = 0;
 

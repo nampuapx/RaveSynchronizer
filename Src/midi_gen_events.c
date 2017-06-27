@@ -30,7 +30,8 @@ void clock_pulse_event_handler(void){
 
 	if(!MIDI_start_status){
 
-		put_MIDI_start();
+		//put_MIDI_start();
+
 
 
 		if(need_start){
@@ -77,22 +78,22 @@ void start_event_handler(void){
 //	UART_2_plain_MIDI_select();
 //	put_MIDI_start();
 //	UART_2_MAX485_switch();
-	put_MIDI_start();
+//	put_MIDI_start();
+//
+//	USBMIDIsend_MIDIStart(0);
+//	USBMIDIsend_MIDIStart(1);
+//	USBD_MIDI_SendPacket();
+//
+//	need_start = 0;
+//
+//	xHigherPriorityTaskWoken = pdFALSE;
+//	xTaskNotifyFromISR( LedTaskHandle,
+//							( 1UL << 1UL ),
+//							eSetBits,
+//							&xHigherPriorityTaskWoken );
+//	portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+//
 
-	USBMIDIsend_MIDIStart(0);
-	USBMIDIsend_MIDIStart(1);
-	USBD_MIDI_SendPacket();
-
-	need_start = 0;
-
-	xHigherPriorityTaskWoken = pdFALSE;
-	xTaskNotifyFromISR( LedTaskHandle,
-							( 1UL << 1UL ),
-							eSetBits,
-							&xHigherPriorityTaskWoken );
-	portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-
-	MIDI_resturt_counter = 0;
 	MIDI_start_status = 0;
 
 }
