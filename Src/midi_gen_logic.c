@@ -32,7 +32,7 @@
 #include <sys_main.h>
 #include "midi_gen_logic.h"
 #include "gui.h"
-
+#include "vc1228.h"
 #include "usbd_def.h"
 
 extern uint8_t uartRX_byte;
@@ -72,6 +72,10 @@ _ext_int_state ext_int_state = internal_clock_and_transport;
 
 
 
+uint32_t wsbuff[WS2812_LENGTH];
+#define RED		0xff000000
+#define BLUE	0x00ff0000
+#define GREEN	0x0000ff00
 
 
 
@@ -139,11 +143,25 @@ void Perf_Task(void){
 
     bpm_hardware_timer_setup(bpm);
 
-    osDelay(2);
+    osDelay(50);
     gui_print_lcd_bpm();
 
-	for(;;){
 
+    uint16_t vs_preddel=0,step;
+
+	for(;;){
+		vs_preddel++;
+		vs_preddel%=1000;
+		if(!vs_preddel){
+
+			for(int i=0;i<WS2812_LENGTH;i++){
+				wsbuff[i] = 0;
+			}
+			wsbuff[step] = RED;
+			WS2812_buff_send(wsbuff, WS2812_LENGTH);
+			step++;
+			step%=WS2812_LENGTH;
+		}
 		  encoder_handle(&enc01_struct);
 
 		  start_request_button_handle(&start_request__button_extLine_struct);
