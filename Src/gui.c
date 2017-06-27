@@ -16,7 +16,6 @@ xQueueHandle q_lcd = 0;
 
 
 
-
 extern uint16_t bpm;
 void gui_print_lcd_bpm(void){
 #ifdef GUI_DISABLE
@@ -31,7 +30,6 @@ void gui_print_lcd_bpm(void){
     	sprintf(working_msg.txt,"BPM EXT");
     }
     xQueueSend( q_lcd, (void *) &working_msg, portMAX_DELAY );
-
 }
 
 
@@ -239,35 +237,12 @@ void lcd_Task(void){
 
 	for(;;){
 
-
 		xQueueReceive( q_lcd, &( working_msg ), portMAX_DELAY );
 		LCDI2C_setCursor(working_msg.xy>>4,working_msg.xy&0x0f);
 		LCDI2C_write_String(working_msg.txt);
 		//osDelay(2);
 
-
 	}
 
 
-
-
-
-		for(;;)
-		{
-			xTaskNotifyWait( 	0x00,      /* Don't clear any notification bits on entry. */
-								0xffffffff , /* Reset the notification value to 0 on exit. */
-								&ulNotifiedValue, /* Notified value pass out in
-												  ulNotifiedValue. */
-								portMAX_DELAY );  /* Block indefinitely. */
-
-
-
-//
-//		HAL_GPIO_WritePin(lamp_01_GPIO_Port, lamp_01_Pin, GPIO_PIN_SET);
-//		osDelay(100);
-//		HAL_GPIO_WritePin(lamp_01_GPIO_Port, lamp_01_Pin, GPIO_PIN_RESET);
-						Onboard_led_ON();
-						osDelay(20);
-						Onboard_led_OFF();
-		}
 }
