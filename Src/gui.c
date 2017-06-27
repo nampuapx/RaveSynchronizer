@@ -215,7 +215,7 @@ void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
 
 void lcd_Task(void){
 
-
+	osDelay(30);
 	type_q_lcd_element working_msg;
 	q_lcd = xQueueCreate( 8, sizeof( type_q_lcd_element ) );
 
