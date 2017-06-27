@@ -30,7 +30,7 @@ void clock_pulse_event_handler(void){
 
 	if(!MIDI_start_status){
 
-		put_MIDI_start();
+		//put_MIDI_start();
 
 
 		if(need_start){
